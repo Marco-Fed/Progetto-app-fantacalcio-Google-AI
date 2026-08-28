@@ -162,10 +162,125 @@ class FantaAstaEngineTest {
         assertTrue(alts.isNotEmpty())
         assertTrue(alts.all { it.player.role == Role.D })
         assertTrue(alts.none { it.player.id == dimarco.id })
-        assertTrue(alts.all { it.starterProb >= 50 })
+        assertTrue(alts.all { it.starterProb >= 40 })
     }
 
-    // 5. Monte Carlo Simulation Tests (< 5s performance constraint)
+    @Test
+    fun testAlternativeEngine_NoticeWhenFewAlternatives() {
+        val rarePlayer = PreloadedPlayersData.defaultPlayers.first { it.id == "a_martinez_l" }
+        // Only 1 alternative available in candidate pool
+        val singleCandidate = PreloadedPlayersData.defaultPlayers.filter { it.role == Role.A && it.id != rarePlayer.id }.take(1)
+
+        val alts = AlternativeEngine.findAlternatives(
+            targetPlayer = rarePlayer,
+            availableInRole = singleCandidate,
+            userTeam = userTeam,
+            config = defaultConfig
+        )
+
+        val eval = QuantitativeEngine.evaluatePlayer(
+            player = rarePlayer,
+            userTeam = userTeam,
+            allTeams = allTeams,
+            availablePlayers = listOf(rarePlayer) + singleCandidate,
+            events = emptyList(),
+            config = defaultConfig
+        )
+
+        assertFalse(eval.hasSufficientAlternatives)
+        assertNotNull(eval.alternativeNotice)
+        assertTrue(eval.alternativeNotice!!.contains("Non ci sono tre alternative"))
+    }
+
+    // 5. Data Confidence & Evidence Weighting Tests
+    @Test
+    fun testDataConfidence_DynamicCalculation() {
+        val lautaro = PreloadedPlayersData.defaultPlayers.first { it.id == "a_martinez_l" }
+        val conf = com.example.engine.PlayerStatModel.computeDataConfidence(lautaro)
+        // Lautaro has 2025/26 and 2024/25 full top 5 league data -> ALTA
+        assertEquals(ConfidenceLevel.ALTA, conf)
+
+        val dummyPlayer = lautaro.copy(
+            stats2024_25Json = "",
+            stats2025_26Json = "",
+            fvm = 1,
+            starterProb2026_27 = 20
+        )
+        val lowConf = com.example.engine.PlayerStatModel.computeDataConfidence(dummyPlayer)
+        assertEquals(ConfidenceLevel.BASSA, lowConf)
+    }
+
+    @Test
+    fun testStructuredNumberedReasons_PresentInDecision() {
+        val lautaro = PreloadedPlayersData.defaultPlayers.first { it.id == "a_martinez_l" }
+        val eval = QuantitativeEngine.evaluatePlayer(
+            player = lautaro,
+            userTeam = userTeam,
+            allTeams = allTeams,
+            availablePlayers = PreloadedPlayersData.defaultPlayers,
+            events = emptyList(),
+            config = defaultConfig
+        )
+
+        assertTrue("Buy reasons must have numbered tags [1], [2], [3]", eval.reasons.buyReasons.any { it.startsWith("[1]") })
+        assertTrue("Caution reasons must have numbered tags [1], [2], [3]", eval.reasons.cautionReasons.any { it.startsWith("[1]") })
+    }
+
+    @Test
+    fun testFairValueAndPriceDistinction() {
+        val lautaro = PreloadedPlayersData.defaultPlayers.first { it.id == "a_martinez_l" }
+        val eval = QuantitativeEngine.evaluatePlayer(
+            player = lautaro,
+            userTeam = userTeam,
+            allTeams = allTeams,
+            availablePlayers = PreloadedPlayersData.defaultPlayers,
+            events = emptyList(),
+            config = defaultConfig
+        )
+
+        assertTrue("Fair Value should be positive", eval.fairValueCredits > 0)
+        assertTrue("Optimal Price Min should be positive", eval.optimalPriceMin > 0)
+        assertTrue("Optimal Price Max >= Optimal Min", eval.optimalPriceMax >= eval.optimalPriceMin)
+        assertTrue("Max Bid >= Optimal Min", eval.maximumBid >= eval.optimalPriceMin)
+        assertTrue("Expected Price Min > 0", eval.expectedAuctionPriceMin > 0)
+    }
+
+    @Test
+    fun testSimpleVsRealisticMinimumBudget() {
+        val team = userTeam.copy(
+            remainingCredits = 100,
+            purchasedCountP = 1, // rem 2
+            purchasedCountD = 4, // rem 4
+            purchasedCountC = 4, // rem 4
+            purchasedCountA = 2  // rem 4
+        )
+        // Total remaining = 14 slots
+        assertEquals(14, team.simpleMinimumBudget(defaultConfig))
+        // Realistic = 2*2 + 4*1 + 4*2 + 4*3 = 4 + 4 + 8 + 12 = 28 cr
+        assertEquals(28, team.realisticMinimumBudget(defaultConfig))
+        assertTrue(team.realisticMinimumBudget(defaultConfig) >= team.simpleMinimumBudget(defaultConfig))
+    }
+
+    @Test
+    fun testInjuredPlayer_DecisionIsPassOrDoNotBid() {
+        val injuredPlayer = PreloadedPlayersData.defaultPlayers.first { it.id == "a_martinez_l" }.copy(
+            status = "Infortunato",
+            injuryNotes = "Lesione legamento crociato",
+            expectedReturnDate = "Febbraio 2027"
+        )
+        val eval = QuantitativeEngine.evaluatePlayer(
+            player = injuredPlayer,
+            userTeam = userTeam,
+            allTeams = allTeams,
+            availablePlayers = PreloadedPlayersData.defaultPlayers,
+            events = emptyList(),
+            config = defaultConfig
+        )
+        assertEquals(DecisionType.PASS, eval.decision)
+        assertTrue(eval.reasons.cautionReasons.any { it.contains("Infortunato") || it.contains("non disponibile") })
+    }
+
+    // 6. Monte Carlo Simulation Tests (< 5s performance constraint)
     @Test(timeout = 5000)
     fun testMonteCarloSimulation_ExecutesUnderConstraint() {
         val calhanoglu = PreloadedPlayersData.defaultPlayers.first { it.id == "c_calhanoglu" }

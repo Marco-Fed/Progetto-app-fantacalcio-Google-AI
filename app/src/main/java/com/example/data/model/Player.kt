@@ -29,9 +29,11 @@ data class HistoricalSeasonStats(
     val season: String, // "2024/25", "2025/26"
     val competition: String = "", // "Serie A", "Premier League", "La Liga", "Bundesliga", "Ligue 1"
     val team: String = "",
-    val appearances: Int = 0, // MP (Matches Played)
-    val starterAppearances: Int = 0, // Starts (Titolare)
-    val starterPercentage: Int = 0, // % Titolarità (Starts / MP * 100)
+    val appearances: Int = 0, // MP (Partite a voto / giocate)
+    val starterAppearances: Int = 0, // Starts (Da titolare)
+    val teamMatchesPlayed: Int = 38, // Partite totali disputate dalla squadra nel campionato
+    val presencePercentage: Int = 0, // % Presenze effettive su partite totali di squadra (appearances / teamMatchesPlayed * 100)
+    val starterPercentage: Int = 0, // % Titolarità nelle partite giocate (Starts / appearances * 100)
     val minutes: Int = 0, // Minuti giocati
     val goals: Int = 0,
     val assists: Int = 0,
@@ -45,7 +47,20 @@ data class HistoricalSeasonStats(
     val penaltiesAttempted: Int = 0,
     val cleanSheets: Int = 0, // Portieri
     val saves: Int = 0, // Portieri
-    val goalsAgainst: Int = 0 // Portieri
+    val goalsAgainst: Int = 0, // Portieri
+    // Advanced FBref / Kaggle metrics
+    val progPasses: Double = 0.0, // PrgP
+    val progCarries: Double = 0.0, // PrgC
+    val keyPasses: Double = 0.0, // KP
+    val passCompletionPct: Double = 0.0, // Cmp%
+    val passesIntoPenArea: Double = 0.0, // PPA
+    val tacklesAndInterceptions: Double = 0.0, // Tkl+Int
+    val ballRecoveries: Double = 0.0, // Recov
+    val aerialDuelWonPct: Double = 0.0, // Aerial Won%
+    val savePct: Double = 0.0, // Save%
+    val goalsPrevented: Double = 0.0, // PSxG-GA
+    val shotCreatingActions: Double = 0.0, // SCA
+    val successfulDribbles: Double = 0.0 // Succ Take-ons
 )
 
 data class SpecialistsInfo(

@@ -864,12 +864,25 @@ fun CalledPlayerCard(
                         modifier = Modifier.weight(1f)
                     )
                     MetricBox(
-                        label = "Prezzo Previsto",
-                        value = "${eval.expectedAuctionPriceMin}–${eval.expectedAuctionPriceMax} cr",
+                        label = "Fair Value",
+                        value = "${eval.fairValueCredits} cr",
                         highlightColor = TextPrimary,
                         modifier = Modifier.weight(1f)
                     )
+                    MetricBox(
+                        label = "Prezzo Previsto",
+                        value = "${eval.expectedAuctionPriceMin}–${eval.expectedAuctionPriceMax} cr",
+                        highlightColor = TextSecondary,
+                        modifier = Modifier.weight(1f)
+                    )
                 }
+
+                Spacer(Modifier.height(8.dp))
+                Text(
+                    text = "Budget Minimo di Completamento: ${eval.simpleMinimumBudget} cr (Semplice) • ${eval.realisticMinimumBudget} cr (Realistico)",
+                    fontSize = 11.sp,
+                    color = TextMuted
+                )
 
                 Spacer(Modifier.height(14.dp))
             }
@@ -1179,11 +1192,19 @@ fun CalledPlayerCard(
                             }
                         }
                     }
+                    if (eval.alternativeNotice != null) {
+                        Spacer(Modifier.height(6.dp))
+                        Text(
+                            text = "ℹ️ ${eval.alternativeNotice}",
+                            fontSize = 11.sp,
+                            color = GoldAccent
+                        )
+                    }
                 } else {
                     Text(
-                        text = "Non ci sono alternative comparabili disponibili in questo momento.",
+                        text = eval.alternativeNotice ?: "Non ci sono tre alternative realmente comparabili disponibili.",
                         fontSize = 12.sp,
-                        color = TextSecondary
+                        color = GoldAccent
                     )
                 }
 

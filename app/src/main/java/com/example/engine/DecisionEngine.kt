@@ -74,67 +74,69 @@ object DecisionEngine {
             )
         }
 
-        // 2. Build Multi-Factor Buy Reasons
-        // [1] Titolarità prevista 2026-27
+        // 2. Build Multi-Factor Buy Reasons (Ranked with explicit tags [1], [2], [3])
+        // [1] Titolarità & Continuità
         if (player.starterProb2026_27 >= 85) {
-            buyReasons.add("Titolarità prevista 2026-27 eccellente: ${player.starterProb2026_27}% garantito nell'undici titolare.")
+            buyReasons.add("[1] Titolarità prevista 2026-27 eccellente: ${player.starterProb2026_27}% garantito nell'undici titolare.")
         } else if (player.starterProb2026_27 >= 70) {
-            buyReasons.add("Titolarità prevista 2026-27 affidabile: ${player.starterProb2026_27}% con buona continuità.")
+            buyReasons.add("[1] Titolarità prevista 2026-27 solida: ${player.starterProb2026_27}% con minutaggio continuo.")
         } else {
-            buyReasons.add("Ballottaggio aperto (${player.starterProb2026_27}% stima titolarità): slot di rotazione o copertura.")
+            buyReasons.add("[1] Rotazione / Ballottaggio (${player.starterProb2026_27}% titolarità): utile come copertura strategica.")
         }
 
-        // [2] Expected Performance & Specialists
+        // [2] Rendimento fanta-statistico & Specialisti
         val expPointsFormatted = String.format("%.2f", player.expectedFantasyPoints)
         if (player.isPenaltyTaker) {
-            buyReasons.add("Specialista Rigori (gerarchia #${player.penaltyOrder}): FantaMedia attesa elevata ($expPointsFormatted).")
+            buyReasons.add("[2] Specialista Rigori (gerarchia #${player.penaltyOrder}): FantaMedia attesa $expPointsFormatted con bonus pesanti.")
         } else if (player.isFreeKickTaker || player.isCornerTaker) {
-            buyReasons.add("Incaricato piazzati/corner: bonus assist attesi frequenti (FM attesa: $expPointsFormatted).")
+            buyReasons.add("[2] Incaricato piazzati/corner: bonus assist attesi frequenti (FM attesa: $expPointsFormatted).")
         } else if (player.expectedFantasyPoints >= 7.0) {
-            buyReasons.add("Rendimento fanta-statistico top: FantaMedia attesa $expPointsFormatted.")
+            buyReasons.add("[2] Rendimento fanta-statistico top di reparto: FantaMedia attesa $expPointsFormatted.")
         } else {
-            buyReasons.add("Rendimento solido e costante: FantaMedia attesa $expPointsFormatted.")
+            buyReasons.add("[2] Rendimento costante e affidabile: FantaMedia attesa $expPointsFormatted.")
         }
 
-        // [3] Role Auction Phase & Scarcity Context
+        // [3] Dinamica di Fase & Scarsità di Ruolo
         when (rolePhase) {
             RoleAuctionPhase.EARLY -> {
-                buyReasons.add("Fase ${player.role.displayName}: EARLY. Opportunità di assicurarsi un cardine solido prima dell'inflazione di fine asta.")
+                buyReasons.add("[3] Fase ${player.role.displayName} (EARLY): opportunità di assicurarsi un top/semitop prima dell'inflazione di fine asta.")
             }
             RoleAuctionPhase.MID -> {
                 if (scarcity >= 0.5) {
-                    buyReasons.add("Fase ${player.role.displayName}: MID ad alta scarsità (${(scarcity * 100).toInt()}%). Le opzioni primarie iniziano a scarseggiare.")
+                    buyReasons.add("[3] Fase ${player.role.displayName} (MID - Scarsità ${(scarcity * 100).toInt()}%): slot primari in rapido esaurimento.")
                 } else {
-                    buyReasons.add("Fase ${player.role.displayName}: MID equilibrata. Rapporto qualità/prezzo favorevole.")
+                    buyReasons.add("[3] Fase ${player.role.displayName} (MID): rapporto qualità/prezzo favorevole.")
                 }
             }
             RoleAuctionPhase.LATE -> {
-                buyReasons.add("Fase ${player.role.displayName}: LATE (scarsità estrema). Uno degli ultimi titolari affidabili disponibili nel ruolo.")
+                buyReasons.add("[3] Fase ${player.role.displayName} (LATE - Scarsità ${(scarcity * 100).toInt()}%): uno degli ultimi titolari affidabili disponibili.")
             }
         }
 
-        // [4] Value vs Alternatives
+        // [4] Valore Marginale vs Alternative
         if (marginalValue >= 10.0) {
-            buyReasons.add("Marginal Value netto (+${String.format("%.1f", marginalValue)} pts): netto salto di qualità rispetto alle alternative libere.")
+            buyReasons.add("[4] Marginal Value netto (+${String.format("%.1f", marginalValue)} pts): netto salto di qualità rispetto alle alternative libere.")
         } else if (marginalValue >= 4.0) {
-            buyReasons.add("Vantaggio marginale positivo (+${String.format("%.1f", marginalValue)} pts) rispetto al replacement player.")
+            buyReasons.add("[4] Vantaggio marginale positivo (+${String.format("%.1f", marginalValue)} pts) rispetto al replacement player.")
         } else {
-            buyReasons.add("Valore di base stabile (replacement player di livello vicino a ${String.format("%.1f", replacementValue)} pts).")
+            buyReasons.add("[4] Valore di base stabile (replacement player di livello a ${String.format("%.1f", replacementValue)} pts).")
         }
 
-        // 3. Build Multi-Factor Caution Reasons
-        cautionReasons.add("Prezzo massimo consigliato: non superare quota $maximumBid crediti per mantenere flessibilità negli altri ruoli.")
+        // 3. Build Multi-Factor Caution Reasons (Ranked with explicit tags [1], [2], [3])
+        cautionReasons.add("[1] Tetto di rilancio consigliato: non superare $maximumBid crediti per mantenere flessibilità negli altri ruoli.")
         
         if (alternatives.isNotEmpty()) {
             val bestAlt = alternatives.first()
-            cautionReasons.add("Alternative valide nel ruolo: ${bestAlt.player.name} (${bestAlt.player.team}, stimato ~${bestAlt.estimatedPrice} crediti).")
+            cautionReasons.add("[2] Alternativa comparabile disponibile: ${bestAlt.player.name} (${bestAlt.player.team}, stimato ~${bestAlt.estimatedPrice} crediti, max ${bestAlt.maximumBid}).")
+        } else {
+            cautionReasons.add("[2] Nessuna alternativa comparabile di pari livello disponibile nel ruolo.")
         }
 
         val remainingBudgetAfterMax = userRemainingCredits - maximumBid
-        cautionReasons.add("Costo opportunità: pagando il massimo resterebbero $remainingBudgetAfterMax crediti per gli altri ${userRoleSlotsRemaining - 1} slot.")
+        cautionReasons.add("[3] Impatto sul budget: dopo un eventuale acquisto a $maximumBid rimarrebbero $remainingBudgetAfterMax crediti per i restanti ${userRoleSlotsRemaining - 1} slot.")
 
         if (player.riskLevel == RiskLevel.ALTO) {
-            cautionReasons.add("Profilo ad alto rischio: possibile alternanza tattica o storico infortuni.")
+            cautionReasons.add("[4] Profilo ad alto rischio: possibile alternanza tattica o storico infortuni.")
         }
 
         // 4. Decision Synthesis
@@ -158,9 +160,9 @@ object DecisionEngine {
 
         val summary = when (decision) {
             DecisionType.BUY -> "Acquisto fortemente consigliato entro il target $optimalPriceMin–$optimalPriceMax crediti (max $maximumBid)."
-            DecisionType.BUY_IF_UNDER -> "Acquista se l'asta rimane sotto $optimalPriceMax crediti. Oltre $maximumBid il costo opportunità è sfavorevole."
-            DecisionType.CONSIDER -> "Valuta l'andamento dei rilanci; ottimo acquisto se strappato sotto i $optimalPriceMin crediti."
-            DecisionType.PASS, DecisionType.DO_NOT_BID -> "Lascia andare: sono disponibili alternative più efficienti per il tuo budget residuo."
+            DecisionType.BUY_IF_UNDER -> "Acquista se l'asta rimane sotto $optimalPriceMax crediti (max $maximumBid). Oltre il costo opportunità è sfavorevole."
+            DecisionType.CONSIDER -> "Valuta l'andamento dei rilanci; ottimo acquisto se strappato sotto i $optimalPriceMin crediti (max $maximumBid)."
+            DecisionType.PASS, DecisionType.DO_NOT_BID -> "Lascia andare: supera il limite di convenienza rispetto alle alternative e al budget residuo."
         }
 
         return Pair(decision, DecisionReasons(buyReasons, cautionReasons, summary))

@@ -58,21 +58,34 @@ object KaggleHistoricalStatsService {
     @Synchronized
     fun ensureInitialized(context: Context? = null) {
         if (isInitialized) return
-        try {
-            if (context != null) {
+        var loaded = false
+        if (context != null) {
+            try {
                 context.assets.open("kaggle_historical_stats.json").use { stream ->
                     initializeFromStream(stream)
+                    loaded = true
                 }
-            } else {
-                // Fallback for JVM unit tests
-                val classLoader = KaggleHistoricalStatsService::class.java.classLoader
-                val stream = classLoader?.getResourceAsStream("assets/kaggle_historical_stats.json")
-                    ?: java.io.File("src/main/assets/kaggle_historical_stats.json").takeIf { it.exists() }?.inputStream()
-                    ?: java.io.File("app/src/main/assets/kaggle_historical_stats.json").takeIf { it.exists() }?.inputStream()
-                stream?.use { initializeFromStream(it) }
+            } catch (e: Exception) {
+                // Fallback to direct file loading
             }
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to load kaggle_historical_stats.json", e)
+        }
+        if (!loaded && !isInitialized) {
+            try {
+                val candidateFiles = listOf(
+                    java.io.File("src/main/assets/kaggle_historical_stats.json"),
+                    java.io.File("app/src/main/assets/kaggle_historical_stats.json"),
+                    java.io.File("../app/src/main/assets/kaggle_historical_stats.json"),
+                    java.io.File("/app/applet/app/src/main/assets/kaggle_historical_stats.json")
+                )
+                val existingFile = candidateFiles.firstOrNull { it.exists() }
+                val stream = existingFile?.inputStream()
+                    ?: KaggleHistoricalStatsService::class.java.classLoader?.getResourceAsStream("assets/kaggle_historical_stats.json")
+                    ?: KaggleHistoricalStatsService::class.java.classLoader?.getResourceAsStream("kaggle_historical_stats.json")
+
+                stream?.use { initializeFromStream(it) }
+            } catch (e: Exception) {
+                Log.e(TAG, "Failed to load kaggle_historical_stats.json", e)
+            }
         }
     }
 
@@ -84,6 +97,9 @@ object KaggleHistoricalStatsService {
             val root = JSONObject(jsonText)
 
             val array24 = root.optJSONArray("season2024_25")
+                ?: root.optJSONArray("2024_25")
+                ?: root.optJSONArray("stats2024_25")
+                ?: root.optJSONArray("season_2024_25")
             if (array24 != null) {
                 for (i in 0 until array24.length()) {
                     val obj = array24.getJSONObject(i)
@@ -96,6 +112,9 @@ object KaggleHistoricalStatsService {
             }
 
             val array25 = root.optJSONArray("season2025_26")
+                ?: root.optJSONArray("2025_26")
+                ?: root.optJSONArray("stats2025_26")
+                ?: root.optJSONArray("season_2025_26")
             if (array25 != null) {
                 for (i in 0 until array25.length()) {
                     val obj = array25.getJSONObject(i)
@@ -193,6 +212,7 @@ object KaggleHistoricalStatsService {
         teamName: String,
         role: Role? = null
     ): Pair<HistoricalSeasonStats?, HistoricalSeasonStats?> {
+        ensureInitialized()
         val normTarget = normalize(playerName)
         val tokens = normTarget.split(" ").filter { it.isNotBlank() }
         if (tokens.isEmpty()) return Pair(null, null)
@@ -309,12 +329,15 @@ object KaggleHistoricalStatsService {
     }
 
     private fun toHistoricalStats(r: KaggleRecord, seasonLabel: String): HistoricalSeasonStats {
+        val presencePct = if (r.mp > 0) ((r.mp * 100) / 38).coerceIn(0, 100) else 0
         return HistoricalSeasonStats(
             season = seasonLabel,
             competition = r.comp,
             team = r.team,
             appearances = r.mp,
             starterAppearances = r.starts,
+            teamMatchesPlayed = 38,
+            presencePercentage = presencePct,
             starterPercentage = r.starterPct,
             minutes = r.minutes,
             goals = r.goals,
@@ -341,6 +364,8 @@ object KaggleHistoricalStatsService {
         json.put("team", stats.team)
         json.put("appearances", stats.appearances)
         json.put("starterAppearances", stats.starterAppearances)
+        json.put("teamMatchesPlayed", stats.teamMatchesPlayed)
+        json.put("presencePercentage", stats.presencePercentage)
         json.put("starterPercentage", stats.starterPercentage)
         json.put("minutes", stats.minutes)
         json.put("goals", stats.goals)
@@ -356,6 +381,18 @@ object KaggleHistoricalStatsService {
         json.put("cleanSheets", stats.cleanSheets)
         json.put("saves", stats.saves)
         json.put("goalsAgainst", stats.goalsAgainst)
+        json.put("progPasses", stats.progPasses)
+        json.put("progCarries", stats.progCarries)
+        json.put("keyPasses", stats.keyPasses)
+        json.put("passCompletionPct", stats.passCompletionPct)
+        json.put("passesIntoPenArea", stats.passesIntoPenArea)
+        json.put("tacklesAndInterceptions", stats.tacklesAndInterceptions)
+        json.put("ballRecoveries", stats.ballRecoveries)
+        json.put("aerialDuelWonPct", stats.aerialDuelWonPct)
+        json.put("savePct", stats.savePct)
+        json.put("goalsPrevented", stats.goalsPrevented)
+        json.put("shotCreatingActions", stats.shotCreatingActions)
+        json.put("successfulDribbles", stats.successfulDribbles)
         return json.toString()
     }
 
@@ -372,6 +409,8 @@ object KaggleHistoricalStatsService {
                 team = obj.optString("team", ""),
                 appearances = apps,
                 starterAppearances = obj.optInt("starterAppearances", 0),
+                teamMatchesPlayed = obj.optInt("teamMatchesPlayed", 38),
+                presencePercentage = obj.optInt("presencePercentage", if (apps > 0) ((apps * 100) / 38).coerceIn(0, 100) else 0),
                 starterPercentage = obj.optInt("starterPercentage", 0),
                 minutes = obj.optInt("minutes", 0),
                 goals = obj.optInt("goals", 0),
@@ -386,7 +425,19 @@ object KaggleHistoricalStatsService {
                 penaltiesAttempted = obj.optInt("penaltiesAttempted", 0),
                 cleanSheets = obj.optInt("cleanSheets", 0),
                 saves = obj.optInt("saves", 0),
-                goalsAgainst = obj.optInt("goalsAgainst", 0)
+                goalsAgainst = obj.optInt("goalsAgainst", 0),
+                progPasses = obj.optDouble("progPasses", 0.0),
+                progCarries = obj.optDouble("progCarries", 0.0),
+                keyPasses = obj.optDouble("keyPasses", 0.0),
+                passCompletionPct = obj.optDouble("passCompletionPct", 0.0),
+                passesIntoPenArea = obj.optDouble("passesIntoPenArea", 0.0),
+                tacklesAndInterceptions = obj.optDouble("tacklesAndInterceptions", 0.0),
+                ballRecoveries = obj.optDouble("ballRecoveries", 0.0),
+                aerialDuelWonPct = obj.optDouble("aerialDuelWonPct", 0.0),
+                savePct = obj.optDouble("savePct", 0.0),
+                goalsPrevented = obj.optDouble("goalsPrevented", 0.0),
+                shotCreatingActions = obj.optDouble("shotCreatingActions", 0.0),
+                successfulDribbles = obj.optDouble("successfulDribbles", 0.0)
             )
         } catch (e: Exception) {
             null

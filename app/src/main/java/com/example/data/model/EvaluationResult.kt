@@ -23,8 +23,12 @@ data class DecisionReasons(
 data class AlternativeComparable(
     val player: PlayerEntity,
     val expectedFantasyPoints: Double,
+    val playerValue: Double = 0.0, // Theoretical score 0-100
     val estimatedPrice: Int,
+    val expectedAuctionPrice: Int = estimatedPrice,
+    val optimalPrice: Int = estimatedPrice,
     val maximumBid: Int,
+    val presencePct: Int = 0,
     val starterProb: Int,
     val riskLevel: RiskLevel,
     val valueDifference: Double // e.g. -0.8 vs target player
@@ -32,8 +36,9 @@ data class AlternativeComparable(
 
 data class QuantitativeEvaluation(
     val player: PlayerEntity,
-    val theoreticalValue: Double, // FantaValore 0-100
-    val userMarginalValue: Double, // Incremental value for user roster
+    val theoreticalValue: Double, // FantaValore 0-100 (Player Value)
+    val fairValueCredits: Int, // Intrinsic fair price in credits for the league economy
+    val userMarginalValue: Double, // Incremental value for user roster vs replacement
     val replacementValue: Double, // Value of best accessible alternative
     val scarcityIndex: Double, // 0.0 - 1.0 (0=abundant, 1=scarce)
     val roleAuctionPhase: RoleAuctionPhase,
@@ -43,11 +48,14 @@ data class QuantitativeEvaluation(
     val maximumBid: Int,
     val expectedAuctionPriceMin: Int,
     val expectedAuctionPriceMax: Int,
+    val simpleMinimumBudget: Int,
+    val realisticMinimumBudget: Int,
     val minimumRequiredBudgetAfterPurchase: Int,
     val winProbabilityMonteCarlo: Double, // 0.0 - 1.0
     val decision: DecisionType,
     val reasons: DecisionReasons,
     val alternatives: List<AlternativeComparable>,
+    val alternativeNotice: String? = null,
     val risk: RiskLevel,
     val confidence: ConfidenceLevel,
     val hasSufficientAlternatives: Boolean

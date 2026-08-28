@@ -1,6 +1,7 @@
 package com.example
 
 import com.example.data.model.Role
+import com.example.data.remote.KaggleHistoricalStatsService
 import com.example.data.repository.CsvImportResult
 import com.example.data.repository.CsvImporter
 import com.example.data.repository.ListoneImportResult
@@ -9,10 +10,21 @@ import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+import org.robolectric.annotation.Config
 import java.io.ByteArrayInputStream
 import java.nio.charset.StandardCharsets
 
+@RunWith(RobolectricTestRunner::class)
+@Config(sdk = [36])
 class ListoneImporterTest {
+
+    @org.junit.Before
+    fun setup() {
+        val context = androidx.test.core.app.ApplicationProvider.getApplicationContext<android.content.Context>()
+        KaggleHistoricalStatsService.ensureInitialized(context)
+    }
 
     @Test
     fun testParseCsvWithSemicolon() {
@@ -29,13 +41,13 @@ class ListoneImporterTest {
         val success = result as ListoneImportResult.Success
         assertEquals(4, success.players.size)
 
-        val lautaro = success.players.find { it.name.contains("Lautaro", ignoreCase = true) || it.name.contains("Martinez", ignoreCase = true) && it.role == Role.A }
+        val lautaro = success.players.find { it.role == Role.A && (it.name.contains("Lautaro", ignoreCase = true) || it.name.contains("Martinez", ignoreCase = true)) }
         assertNotNull(lautaro)
         assertEquals(Role.A, lautaro?.role)
         assertEquals("Inter", lautaro?.team)
-
-        // Verify stats are automatically enriched
-        assertTrue("Lautaro should have 2025/26 stats", lautaro?.stats2025_26Json?.isNotBlank() == true)
+        assertEquals(38, lautaro?.quotation)
+        assertEquals(367, lautaro?.fvm)
+        assertTrue("Expected fantasy points should be positive", (lautaro?.expectedFantasyPoints ?: 0.0) >= 6.0)
     }
 
     @Test
@@ -49,6 +61,29 @@ class ListoneImporterTest {
         val success = result as ListoneImportResult.Success
         assertEquals(2, success.players.size)
         assertEquals("Thuram Marcus", success.players[0].name)
+    }
+
+    @Test
+    fun testExpectedFantasyPointsInPlausibleRange() {
+        val testCsv = """
+            R;Nome;Squadra;Qt.A;FVM;FM
+            P;Sommer;Inter;15;50;5.8
+            D;Dimarco;Inter;22;120;6.8
+            C;Calhanoglu;Inter;28;210;7.4
+            A;Lautaro Martinez;Inter;38;367;8.6
+            A;Bench Striker;Empoli;1;1;5.5
+        """.trimIndent()
+
+        val result = ListoneImporter.parseStream(ByteArrayInputStream(testCsv.toByteArray(StandardCharsets.UTF_8)))
+        assertTrue(result is ListoneImportResult.Success)
+        val players = (result as ListoneImportResult.Success).players
+
+        for (player in players) {
+            assertTrue(
+                "Player ${player.name} expected points (${player.expectedFantasyPoints}) must be within [4.5, 9.0]",
+                player.expectedFantasyPoints in 4.5..9.0
+            )
+        }
     }
 
     @Test

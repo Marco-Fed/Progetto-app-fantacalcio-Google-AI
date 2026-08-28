@@ -1,11 +1,43 @@
 package com.example.data.model
 
-import com.example.data.remote.KaggleHistoricalStatsService
-
 object PreloadedPlayersData {
 
     fun parseStats(jsonStr: String): HistoricalSeasonStats? {
-        return KaggleHistoricalStatsService.parseStats(jsonStr)
+        if (jsonStr.isBlank()) return null
+        return try {
+            fun extractString(key: String): String {
+                val pattern = """"$key"\s*:\s*"([^"]*)"""".toRegex()
+                return pattern.find(jsonStr)?.groupValues?.get(1) ?: ""
+            }
+            fun extractInt(key: String): Int {
+                val pattern = """"$key"\s*:\s*(-?\d+)""".toRegex()
+                return pattern.find(jsonStr)?.groupValues?.get(1)?.toIntOrNull() ?: 0
+            }
+            fun extractDouble(key: String): Double {
+                val pattern = """"$key"\s*:\s*(-?\d+(\.\d+)?)""".toRegex()
+                return pattern.find(jsonStr)?.groupValues?.get(1)?.toDoubleOrNull() ?: 0.0
+            }
+
+            HistoricalSeasonStats(
+                season = extractString("season"),
+                team = extractString("team"),
+                appearances = extractInt("appearances"),
+                starterAppearances = extractInt("starterAppearances"),
+                starterPercentage = extractInt("starterPercentage"),
+                goals = extractInt("goals"),
+                assists = extractInt("assists"),
+                expectedGoals = extractDouble("expectedGoals"),
+                expectedAssists = extractDouble("expectedAssists"),
+                ratingAvg = extractDouble("ratingAvg").takeIf { it > 0 } ?: 6.0,
+                fantaRatingAvg = extractDouble("fantaRatingAvg").takeIf { it > 0 } ?: 6.0,
+                yellowCards = extractInt("yellowCards"),
+                redCards = extractInt("redCards"),
+                penaltiesScored = extractInt("penaltiesScored"),
+                cleanSheets = extractInt("cleanSheets")
+            )
+        } catch (e: Exception) {
+            null
+        }
     }
 
     val defaultPlayers: List<PlayerEntity> = listOf(
@@ -28,9 +60,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 38, \"starterAppearances\": 38, \"starterPercentage\": 100, \"minutes\": 3420, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 16, \"saves\": 117, \"goalsAgainst\": 35}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 38, \"starterAppearances\": 38, \"starterPercentage\": 100, \"minutes\": 3420, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 18, \"saves\": 107, \"goalsAgainst\": 31}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Roma\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.07, \"fantaRatingAvg\": 4.97, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Roma\", \"appearances\": 25, \"starterAppearances\": 19, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.02, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Roma\", \"appearances\": 28, \"starterAppearances\": 22, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.15, \"fantaRatingAvg\": 5.12, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 7}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -54,9 +86,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 5, \"starterAppearances\": 5, \"starterPercentage\": 100, \"minutes\": 450, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 3, \"saves\": 11, \"goalsAgainst\": 3}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 5, \"starterAppearances\": 5, \"starterPercentage\": 100, \"minutes\": 450, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 3, \"saves\": 10, \"goalsAgainst\": 4}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Inter\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 4.95, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Inter\", \"appearances\": 25, \"starterAppearances\": 19, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.09, \"fantaRatingAvg\": 5.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Inter\", \"appearances\": 28, \"starterAppearances\": 22, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.14, \"fantaRatingAvg\": 5.1, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -80,9 +112,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Sportiello",
             ballottaggioShare = 85,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 34, \"starterAppearances\": 34, \"starterPercentage\": 100, \"minutes\": 3060, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 13, \"saves\": 97, \"goalsAgainst\": 34}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 37, \"starterAppearances\": 37, \"starterPercentage\": 100, \"minutes\": 3330, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 13, \"saves\": 112, \"goalsAgainst\": 35}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Atalanta\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.93, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Atalanta\", \"appearances\": 25, \"starterAppearances\": 18, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.08, \"fantaRatingAvg\": 4.98, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Atalanta\", \"appearances\": 28, \"starterAppearances\": 21, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.13, \"fantaRatingAvg\": 5.08, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -106,9 +138,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Tornqvist",
             ballottaggioShare = 90,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 19, \"starterAppearances\": 18, \"starterPercentage\": 94, \"minutes\": 1666, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 5, \"saves\": 48, \"goalsAgainst\": 20}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 38, \"starterAppearances\": 38, \"starterPercentage\": 100, \"minutes\": 3420, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 19, \"saves\": 86, \"goalsAgainst\": 29}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Como\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.93, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Como\", \"appearances\": 25, \"starterAppearances\": 18, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.08, \"fantaRatingAvg\": 4.98, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Como\", \"appearances\": 28, \"starterAppearances\": 21, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.13, \"fantaRatingAvg\": 5.08, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -132,9 +164,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Perin",
             ballottaggioShare = 90,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"eng Premier League\", \"team\": \"Tottenham\", \"appearances\": 24, \"starterAppearances\": 24, \"starterPercentage\": 100, \"minutes\": 2160, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 4, \"saves\": 67, \"goalsAgainst\": 37}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"eng Premier League\", \"team\": \"Tottenham Hotspur\", \"appearances\": 31, \"starterAppearances\": 31, \"starterPercentage\": 100, \"minutes\": 2790, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 7, \"saves\": 83, \"goalsAgainst\": 50}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Juventus\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 4.95, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Juventus\", \"appearances\": 25, \"starterAppearances\": 18, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.09, \"fantaRatingAvg\": 5.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Juventus\", \"appearances\": 28, \"starterAppearances\": 21, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.14, \"fantaRatingAvg\": 5.1, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Infortunato",
             injuryNotes = "Problema muscolare",
             expectedReturnDate = "Da valutare"
@@ -158,9 +190,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Torriani",
             ballottaggioShare = 95,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 37, \"starterAppearances\": 37, \"starterPercentage\": 100, \"minutes\": 3294, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 12, \"saves\": 97, \"goalsAgainst\": 41}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 37, \"starterAppearances\": 37, \"starterPercentage\": 100, \"minutes\": 3295, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 14, \"saves\": 106, \"goalsAgainst\": 35}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Milan\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.93, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Milan\", \"appearances\": 25, \"starterAppearances\": 18, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.08, \"fantaRatingAvg\": 4.98, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Milan\", \"appearances\": 28, \"starterAppearances\": 21, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.13, \"fantaRatingAvg\": 5.08, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -184,9 +216,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Christensen O.",
             ballottaggioShare = 90,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 34, \"starterAppearances\": 34, \"starterPercentage\": 100, \"minutes\": 3060, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 10, \"saves\": 94, \"goalsAgainst\": 38}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 37, \"starterAppearances\": 37, \"starterPercentage\": 100, \"minutes\": 3330, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 10, \"saves\": 119, \"goalsAgainst\": 49}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Fiorentina\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.04, \"fantaRatingAvg\": 4.91, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Fiorentina\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.07, \"fantaRatingAvg\": 4.96, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Fiorentina\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.12, \"fantaRatingAvg\": 5.06, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -210,9 +242,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Milinkovic-Savic V.",
             ballottaggioShare = 75,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 34, \"starterAppearances\": 34, \"starterPercentage\": 100, \"minutes\": 3005, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 16, \"saves\": 59, \"goalsAgainst\": 25}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 11, \"starterAppearances\": 11, \"starterPercentage\": 100, \"minutes\": 979, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 4, \"saves\": 21, \"goalsAgainst\": 12}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Napoli\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.93, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Napoli\", \"appearances\": 25, \"starterAppearances\": 18, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.08, \"fantaRatingAvg\": 4.98, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Napoli\", \"appearances\": 28, \"starterAppearances\": 21, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.13, \"fantaRatingAvg\": 5.08, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -236,9 +268,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Happonen",
             ballottaggioShare = 80,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 27, \"starterAppearances\": 27, \"starterPercentage\": 100, \"minutes\": 2364, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 8, \"saves\": 50, \"goalsAgainst\": 33}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 19, \"starterAppearances\": 19, \"starterPercentage\": 100, \"minutes\": 1592, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 8, \"saves\": 33, \"goalsAgainst\": 18}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Bologna\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.04, \"fantaRatingAvg\": 4.91, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Bologna\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.07, \"fantaRatingAvg\": 4.96, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Bologna\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.12, \"fantaRatingAvg\": 5.06, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -262,9 +294,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Sherri",
             ballottaggioShare = 85,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Cagliari\", \"appearances\": 18, \"starterAppearances\": 18, \"starterPercentage\": 100, \"minutes\": 1620, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 5, \"saves\": 44, \"goalsAgainst\": 22}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Cagliari\", \"appearances\": 38, \"starterAppearances\": 38, \"starterPercentage\": 100, \"minutes\": 3420, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 8, \"saves\": 121, \"goalsAgainst\": 53}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Cagliari\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.04, \"fantaRatingAvg\": 4.9, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Cagliari\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.07, \"fantaRatingAvg\": 4.95, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Cagliari\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.12, \"fantaRatingAvg\": 5.05, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -288,9 +320,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 9, \"starterAppearances\": 9, \"starterPercentage\": 100, \"minutes\": 810, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 4, \"saves\": 20, \"goalsAgainst\": 7}",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lazio\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.04, \"fantaRatingAvg\": 4.9, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lazio\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.07, \"fantaRatingAvg\": 4.95, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lazio\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.12, \"fantaRatingAvg\": 5.05, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -314,9 +346,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Bleve",
             ballottaggioShare = 90,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 38, \"starterAppearances\": 38, \"starterPercentage\": 100, \"minutes\": 3420, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 9, \"saves\": 125, \"goalsAgainst\": 58}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 38, \"starterAppearances\": 38, \"starterPercentage\": 100, \"minutes\": 3420, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 10, \"saves\": 108, \"goalsAgainst\": 50}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lecce\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.04, \"fantaRatingAvg\": 4.9, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lecce\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.07, \"fantaRatingAvg\": 4.95, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lecce\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.12, \"fantaRatingAvg\": 5.05, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -340,9 +372,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Padelli",
             ballottaggioShare = 85,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 25, \"starterAppearances\": 25, \"starterPercentage\": 100, \"minutes\": 2250, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 4, \"saves\": 73, \"goalsAgainst\": 40}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 30, \"starterAppearances\": 30, \"starterPercentage\": 100, \"minutes\": 2616, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 10, \"saves\": 80, \"goalsAgainst\": 37}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Udinese\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.04, \"fantaRatingAvg\": 4.9, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Udinese\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.07, \"fantaRatingAvg\": 4.95, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Udinese\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.12, \"fantaRatingAvg\": 5.05, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -366,9 +398,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Sommariva",
             ballottaggioShare = 80,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 16, \"starterAppearances\": 16, \"starterPercentage\": 100, \"minutes\": 1395, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 5, \"saves\": 45, \"goalsAgainst\": 20}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Genoa\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.03, \"fantaRatingAvg\": 4.88, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Genoa\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 4.93, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Genoa\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.11, \"fantaRatingAvg\": 5.03, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -392,9 +424,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Parma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.03, \"fantaRatingAvg\": 4.87, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Parma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 4.92, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Parma\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.11, \"fantaRatingAvg\": 5.02, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -418,9 +450,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Turati",
             ballottaggioShare = 75,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"eng Premier League\", \"team\": \"Ipswich Town\", \"appearances\": 18, \"starterAppearances\": 18, \"starterPercentage\": 100, \"minutes\": 1620, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 1, \"saves\": 67, \"goalsAgainst\": 33}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Sassuolo\", \"appearances\": 32, \"starterAppearances\": 32, \"starterPercentage\": 100, \"minutes\": 2880, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 6, \"saves\": 118, \"goalsAgainst\": 43}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Sassuolo\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.03, \"fantaRatingAvg\": 4.88, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Sassuolo\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 4.93, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Sassuolo\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.11, \"fantaRatingAvg\": 5.03, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -444,9 +476,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 5, \"starterAppearances\": 5, \"starterPercentage\": 100, \"minutes\": 450, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 3, \"saves\": 13, \"goalsAgainst\": 3}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 9, \"starterAppearances\": 9, \"starterPercentage\": 100, \"minutes\": 765, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 3, \"saves\": 13, \"goalsAgainst\": 9}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Juventus\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Juventus\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Juventus\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -470,9 +502,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Venezia\", \"appearances\": 16, \"starterAppearances\": 16, \"starterPercentage\": 100, \"minutes\": 1367, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 60, \"goalsAgainst\": 23}",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.03, \"fantaRatingAvg\": 4.87, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 4.92, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Venezia\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.11, \"fantaRatingAvg\": 5.02, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -496,9 +528,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.03, \"fantaRatingAvg\": 4.87, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 4.92, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Frosinone\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.11, \"fantaRatingAvg\": 5.02, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -522,9 +554,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.03, \"fantaRatingAvg\": 4.87, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 4.92, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Monza\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.11, \"fantaRatingAvg\": 5.02, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -548,9 +580,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Torino\", \"appearances\": 37, \"starterAppearances\": 37, \"starterPercentage\": 100, \"minutes\": 3330, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 10, \"saves\": 129, \"goalsAgainst\": 42}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 27, \"starterAppearances\": 27, \"starterPercentage\": 100, \"minutes\": 2430, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 11, \"saves\": 52, \"goalsAgainst\": 24}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Napoli\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.86, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Napoli\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.91, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Napoli\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.01, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -574,9 +606,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Frosinone\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -600,9 +632,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 29, \"starterAppearances\": 29, \"starterPercentage\": 100, \"minutes\": 2610, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 5, \"saves\": 52, \"goalsAgainst\": 42}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 27, \"starterAppearances\": 27, \"starterPercentage\": 100, \"minutes\": 2430, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 12, \"saves\": 87, \"goalsAgainst\": 27}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Inter\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Inter\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Inter\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -626,9 +658,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 2, \"starterAppearances\": 1, \"starterPercentage\": 50, \"minutes\": 126, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 1, \"saves\": 4, \"goalsAgainst\": 2}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 1, \"starterAppearances\": 1, \"starterPercentage\": 100, \"minutes\": 90, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 3, \"goalsAgainst\": 1}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Atalanta\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Atalanta\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Atalanta\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -652,9 +684,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Bologna\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Bologna\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Bologna\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -678,9 +710,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"minutes\": 353, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 3, \"saves\": 7, \"goalsAgainst\": 2}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Bologna\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Bologna\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Bologna\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -704,9 +736,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Cagliari\", \"appearances\": 7, \"starterAppearances\": 7, \"starterPercentage\": 100, \"minutes\": 621, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 1, \"saves\": 20, \"goalsAgainst\": 11}",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Cagliari\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Cagliari\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Cagliari\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -730,9 +762,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Como\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Como\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Como\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -756,9 +788,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Como\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Como\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Como\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -782,9 +814,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 1, \"starterAppearances\": 1, \"starterPercentage\": 100, \"minutes\": 86, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 6, \"goalsAgainst\": 1}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Fiorentina\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Fiorentina\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Fiorentina\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -808,9 +840,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 1, \"starterAppearances\": 0, \"starterPercentage\": 0, \"minutes\": 4, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Fiorentina\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Fiorentina\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Fiorentina\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -834,9 +866,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Frosinone\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -860,9 +892,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 1, \"starterAppearances\": 0, \"starterPercentage\": 0, \"minutes\": 28, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 2, \"goalsAgainst\": 1}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 2, \"starterAppearances\": 1, \"starterPercentage\": 50, \"minutes\": 176, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 8, \"goalsAgainst\": 4}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Genoa\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -886,9 +918,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Genoa\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -912,9 +944,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 1, \"starterAppearances\": 0, \"starterPercentage\": 0, \"minutes\": 10, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 1, \"goalsAgainst\": 1}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Inter\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Inter\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Inter\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -938,9 +970,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Juventus\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Juventus\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Juventus\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -964,9 +996,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 9, \"starterAppearances\": 9, \"starterPercentage\": 100, \"minutes\": 810, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 3, \"saves\": 22, \"goalsAgainst\": 10}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lazio\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lazio\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lazio\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -990,9 +1022,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lazio\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lazio\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lazio\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1016,9 +1048,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 3, \"starterAppearances\": 3, \"starterPercentage\": 100, \"minutes\": 270, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 1, \"saves\": 10, \"goalsAgainst\": 3}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 2, \"starterAppearances\": 1, \"starterPercentage\": 50, \"minutes\": 125, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 2, \"saves\": 4, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Milan\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Milan\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Milan\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1042,9 +1074,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Milan\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Milan\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Milan\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1068,9 +1100,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Monza\", \"appearances\": 9, \"starterAppearances\": 8, \"starterPercentage\": 88, \"minutes\": 736, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 1, \"saves\": 22, \"goalsAgainst\": 17}",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Monza\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1094,9 +1126,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Monza\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1120,9 +1152,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 1, \"starterAppearances\": 0, \"starterPercentage\": 0, \"minutes\": 11, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 1, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Napoli\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Napoli\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Napoli\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1146,9 +1178,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Parma\", \"appearances\": 17, \"starterAppearances\": 17, \"starterPercentage\": 100, \"minutes\": 1530, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 7, \"saves\": 44, \"goalsAgainst\": 18}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Parma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.03, \"fantaRatingAvg\": 4.87, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Parma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 4.92, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Parma\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.11, \"fantaRatingAvg\": 5.02, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1172,9 +1204,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Roma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Roma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Roma\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1198,9 +1230,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 7, \"starterAppearances\": 7, \"starterPercentage\": 100, \"minutes\": 630, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 1, \"saves\": 16, \"goalsAgainst\": 15}",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Roma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Roma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Roma\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1224,9 +1256,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Sassuolo\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1250,9 +1282,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Monza\", \"appearances\": 30, \"starterAppearances\": 30, \"starterPercentage\": 100, \"minutes\": 2676, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 2, \"saves\": 93, \"goalsAgainst\": 52}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Sassuolo\", \"appearances\": 6, \"starterAppearances\": 6, \"starterPercentage\": 100, \"minutes\": 532, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 2, \"saves\": 15, \"goalsAgainst\": 7}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Sassuolo\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1276,9 +1308,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.03, \"fantaRatingAvg\": 4.87, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 4.92, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Torino\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.11, \"fantaRatingAvg\": 5.02, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1302,9 +1334,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Torino\", \"appearances\": 1, \"starterAppearances\": 1, \"starterPercentage\": 100, \"minutes\": 90, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 4, \"goalsAgainst\": 3}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Torino\", \"appearances\": 29, \"starterAppearances\": 29, \"starterPercentage\": 100, \"minutes\": 2610, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 9, \"saves\": 82, \"goalsAgainst\": 45}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Torino\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1328,9 +1360,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Torino\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1354,9 +1386,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 1, \"starterAppearances\": 1, \"starterPercentage\": 100, \"minutes\": 90, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 1, \"saves\": 3, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 2, \"starterAppearances\": 2, \"starterPercentage\": 100, \"minutes\": 180, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 3, \"goalsAgainst\": 2}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Udinese\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1380,9 +1412,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Udinese\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1406,9 +1438,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Venezia\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1432,9 +1464,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Venezia\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1458,9 +1490,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Atalanta\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Atalanta\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Atalanta\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1484,9 +1516,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Sassuolo\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1510,9 +1542,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lecce\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lecce\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lecce\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1536,9 +1568,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Frosinone\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1562,9 +1594,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Cagliari\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Cagliari\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Cagliari\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1588,9 +1620,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Hellas Verona\", \"appearances\": 36, \"starterAppearances\": 36, \"starterPercentage\": 100, \"minutes\": 3240, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 8, \"saves\": 97, \"goalsAgainst\": 64}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Hellas Verona\", \"appearances\": 35, \"starterAppearances\": 35, \"starterPercentage\": 100, \"minutes\": 3150, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 5, \"saves\": 87, \"goalsAgainst\": 54}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Venezia\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1614,9 +1646,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lecce\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 4.85, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lecce\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 4.9, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lecce\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 5.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1640,9 +1672,9 @@ object PreloadedPlayersData {
             isCornerTaker = true,
             ballottaggioRival = "Carlos Augusto",
             ballottaggioShare = 70,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 32, \"starterAppearances\": 28, \"starterPercentage\": 87, \"minutes\": 2140, \"goals\": 4, \"assists\": 7, \"expectedGoals\": 3.3, \"expectedAssists\": 6.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 35, \"starterAppearances\": 30, \"starterPercentage\": 85, \"minutes\": 2698, \"goals\": 7, \"assists\": 16, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Inter\", \"appearances\": 27, \"starterAppearances\": 23, \"starterPercentage\": 87, \"goals\": 2, \"assists\": 3, \"expectedGoals\": 1.8, \"expectedAssists\": 2.4, \"ratingAvg\": 6.15, \"fantaRatingAvg\": 6.49, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 9}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Inter\", \"appearances\": 29, \"starterAppearances\": 25, \"starterPercentage\": 87, \"goals\": 2, \"assists\": 3, \"expectedGoals\": 1.8, \"expectedAssists\": 2.4, \"ratingAvg\": 6.18, \"fantaRatingAvg\": 6.54, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 10}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Inter\", \"appearances\": 32, \"starterAppearances\": 28, \"starterPercentage\": 87, \"goals\": 3, \"assists\": 4, \"expectedGoals\": 2.8, \"expectedAssists\": 3.4, \"ratingAvg\": 6.23, \"fantaRatingAvg\": 6.64, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 12}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1666,9 +1698,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"es La Liga\", \"team\": \"Atl\u00e9tico Madrid\", \"appearances\": 30, \"starterAppearances\": 17, \"starterPercentage\": 56, \"minutes\": 1590, \"goals\": 0, \"assists\": 3, \"expectedGoals\": 0.8, \"expectedAssists\": 1.5, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"es La Liga\", \"team\": \"Atl\u00e9tico Madrid\", \"appearances\": 26, \"starterAppearances\": 13, \"starterPercentage\": 50, \"minutes\": 1331, \"goals\": 2, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Roma\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 6.03, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Roma\", \"appearances\": 25, \"starterAppearances\": 19, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.99, \"fantaRatingAvg\": 6.08, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 7}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Roma\", \"appearances\": 28, \"starterAppearances\": 22, \"starterPercentage\": 78, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 1.1, \"expectedAssists\": 1.0, \"ratingAvg\": 6.04, \"fantaRatingAvg\": 6.18, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 8}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1692,9 +1724,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"eng Premier League\", \"team\": \"Chelsea\", \"appearances\": 14, \"starterAppearances\": 14, \"starterPercentage\": 100, \"minutes\": 1172, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.4, \"expectedAssists\": 0.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 30, \"starterAppearances\": 28, \"starterPercentage\": 93, \"minutes\": 2448, \"goals\": 5, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 2, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Roma\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 6.03, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Roma\", \"appearances\": 25, \"starterAppearances\": 19, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.99, \"fantaRatingAvg\": 6.08, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 7}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Roma\", \"appearances\": 28, \"starterAppearances\": 22, \"starterPercentage\": 78, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 1.1, \"expectedAssists\": 1.0, \"ratingAvg\": 6.04, \"fantaRatingAvg\": 6.18, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 8}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1718,9 +1750,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"eng Premier League\", \"team\": \"Manchester City\", \"appearances\": 26, \"starterAppearances\": 23, \"starterPercentage\": 88, \"minutes\": 2014, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 1.6, \"expectedAssists\": 0.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 33, \"starterAppearances\": 31, \"starterPercentage\": 93, \"minutes\": 2821, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Inter\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.93, \"fantaRatingAvg\": 5.86, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Inter\", \"appearances\": 25, \"starterAppearances\": 18, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.91, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Inter\", \"appearances\": 28, \"starterAppearances\": 21, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 6.01, \"fantaRatingAvg\": 6.01, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 7}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1744,9 +1776,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 6, \"starterAppearances\": 6, \"starterPercentage\": 100, \"minutes\": 540, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.1, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 26, \"starterAppearances\": 25, \"starterPercentage\": 96, \"minutes\": 2171, \"goals\": 4, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Juventus\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.94, \"fantaRatingAvg\": 5.87, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Juventus\", \"appearances\": 25, \"starterAppearances\": 18, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.92, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Juventus\", \"appearances\": 28, \"starterAppearances\": 21, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 6.02, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 7}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1770,9 +1802,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Hermoso",
             ballottaggioShare = 65,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 37, \"starterAppearances\": 36, \"starterPercentage\": 97, \"minutes\": 3143, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 1.7, \"expectedAssists\": 0.9, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 8, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 36, \"starterAppearances\": 36, \"starterPercentage\": 100, \"minutes\": 3059, \"goals\": 4, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 9, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Roma\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.93, \"fantaRatingAvg\": 5.86, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Roma\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.91, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Roma\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 6.01, \"fantaRatingAvg\": 6.01, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 7}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1796,9 +1828,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 32, \"starterAppearances\": 30, \"starterPercentage\": 93, \"minutes\": 2333, \"goals\": 1, \"assists\": 5, \"expectedGoals\": 0.8, \"expectedAssists\": 2.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 28, \"starterAppearances\": 28, \"starterPercentage\": 100, \"minutes\": 2239, \"goals\": 1, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Inter\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.85, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Inter\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.9, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Inter\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 7}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1822,9 +1854,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 24, \"starterAppearances\": 21, \"starterPercentage\": 87, \"minutes\": 1864, \"goals\": 2, \"assists\": 1, \"expectedGoals\": 1.8, \"expectedAssists\": 1.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 34, \"starterAppearances\": 33, \"starterPercentage\": 97, \"minutes\": 2869, \"goals\": 5, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Milan\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.85, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Milan\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.9, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Milan\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 7}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1848,9 +1880,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 38, \"starterAppearances\": 38, \"starterPercentage\": 100, \"minutes\": 3406, \"goals\": 1, \"assists\": 3, \"expectedGoals\": 2.9, \"expectedAssists\": 1.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 21, \"starterAppearances\": 21, \"starterPercentage\": 100, \"minutes\": 1795, \"goals\": 2, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Napoli\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.93, \"fantaRatingAvg\": 5.86, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Napoli\", \"appearances\": 25, \"starterAppearances\": 18, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.91, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Napoli\", \"appearances\": 28, \"starterAppearances\": 21, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 6.01, \"fantaRatingAvg\": 6.01, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 7}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1874,9 +1906,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Gatti",
             ballottaggioShare = 65,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 29, \"starterAppearances\": 25, \"starterPercentage\": 86, \"minutes\": 2337, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.7, \"expectedAssists\": 0.5, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 37, \"starterAppearances\": 37, \"starterPercentage\": 100, \"minutes\": 3281, \"goals\": 2, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Juventus\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.85, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Juventus\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.9, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Juventus\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 7}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1900,9 +1932,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Koulierakis",
             ballottaggioShare = 60,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 38, \"starterAppearances\": 38, \"starterPercentage\": 100, \"minutes\": 3420, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 1.0, \"expectedAssists\": 0.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 31, \"starterAppearances\": 31, \"starterPercentage\": 100, \"minutes\": 2680, \"goals\": 3, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Roma\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.85, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Roma\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.9, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Roma\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 7}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1926,9 +1958,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 19, \"starterAppearances\": 19, \"starterPercentage\": 100, \"minutes\": 1672, \"goals\": 1, \"assists\": 2, \"expectedGoals\": 0.8, \"expectedAssists\": 1.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 35, \"starterAppearances\": 34, \"starterPercentage\": 97, \"minutes\": 2959, \"goals\": 3, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 1, \"penaltiesAttempted\": 1, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Udinese\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.85, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Udinese\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.9, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Udinese\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 7}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1952,9 +1984,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Pavard",
             ballottaggioShare = 60,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 26, \"starterAppearances\": 16, \"starterPercentage\": 61, \"minutes\": 1553, \"goals\": 3, \"assists\": 2, \"expectedGoals\": 2.6, \"expectedAssists\": 0.9, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 23, \"starterAppearances\": 21, \"starterPercentage\": 91, \"minutes\": 1922, \"goals\": 3, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Inter\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.84, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Inter\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.94, \"fantaRatingAvg\": 5.89, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Inter\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.99, \"fantaRatingAvg\": 5.99, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -1978,9 +2010,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"eng Premier League\", \"team\": \"Manchester City\", \"appearances\": 11, \"starterAppearances\": 6, \"starterPercentage\": 54, \"minutes\": 548, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 0.4, \"expectedAssists\": 0.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"eng Premier League\", \"team\": \"Manchester City\", \"appearances\": 9, \"starterAppearances\": 5, \"starterPercentage\": 55, \"minutes\": 439, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Inter\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.83, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Inter\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.93, \"fantaRatingAvg\": 5.88, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Inter\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.98, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2004,9 +2036,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 32, \"starterAppearances\": 31, \"starterPercentage\": 96, \"minutes\": 2741, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 1.1, \"expectedAssists\": 0.6, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 8, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 31, \"starterAppearances\": 31, \"starterPercentage\": 100, \"minutes\": 2472, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Milan\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.83, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Milan\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.93, \"fantaRatingAvg\": 5.88, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Milan\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.98, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2030,9 +2062,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 37, \"starterAppearances\": 37, \"starterPercentage\": 100, \"minutes\": 3330, \"goals\": 3, \"assists\": 2, \"expectedGoals\": 2.8, \"expectedAssists\": 3.9, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 26, \"starterAppearances\": 26, \"starterPercentage\": 100, \"minutes\": 2276, \"goals\": 2, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Napoli\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.85, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Napoli\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.9, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Napoli\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 7}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2056,9 +2088,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"eng Premier League\", \"team\": \"Tottenham\", \"appearances\": 25, \"starterAppearances\": 19, \"starterPercentage\": 76, \"minutes\": 1792, \"goals\": 1, \"assists\": 2, \"expectedGoals\": 0.6, \"expectedAssists\": 1.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"eng Premier League\", \"team\": \"Tottenham Hotspur\", \"appearances\": 30, \"starterAppearances\": 23, \"starterPercentage\": 76, \"minutes\": 2055, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Inter\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.85, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Inter\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.9, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Inter\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 7}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2082,9 +2114,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 30, \"starterAppearances\": 30, \"starterPercentage\": 100, \"minutes\": 2622, \"goals\": 5, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Genoa\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.85, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Genoa\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.9, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Genoa\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 7}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2108,9 +2140,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 6, \"starterAppearances\": 4, \"starterPercentage\": 66, \"minutes\": 272, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.1, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 24, \"starterAppearances\": 23, \"starterPercentage\": 95, \"minutes\": 1808, \"goals\": 3, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Atalanta\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.83, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Atalanta\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.93, \"fantaRatingAvg\": 5.88, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Atalanta\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.98, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2134,9 +2166,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Chalobah T.",
             ballottaggioShare = 60,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 32, \"starterAppearances\": 30, \"starterPercentage\": 93, \"minutes\": 2742, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 11, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Como\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.84, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Como\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.94, \"fantaRatingAvg\": 5.89, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Como\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.99, \"fantaRatingAvg\": 5.99, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2160,9 +2192,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 34, \"starterAppearances\": 34, \"starterPercentage\": 100, \"minutes\": 3025, \"goals\": 0, \"assists\": 4, \"expectedGoals\": 1.4, \"expectedAssists\": 4.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 8, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 36, \"starterAppearances\": 36, \"starterPercentage\": 100, \"minutes\": 3134, \"goals\": 1, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Fiorentina\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Fiorentina\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Fiorentina\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2186,9 +2218,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Mancini",
             ballottaggioShare = 35,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 8, \"starterAppearances\": 2, \"starterPercentage\": 25, \"minutes\": 251, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.1, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 27, \"starterAppearances\": 25, \"starterPercentage\": 92, \"minutes\": 2085, \"goals\": 3, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 9, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Roma\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.83, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Roma\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.93, \"fantaRatingAvg\": 5.88, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Roma\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.98, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2212,9 +2244,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 36, \"starterAppearances\": 34, \"starterPercentage\": 94, \"minutes\": 3041, \"goals\": 3, \"assists\": 0, \"expectedGoals\": 2.4, \"expectedAssists\": 0.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 9, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 36, \"starterAppearances\": 36, \"starterPercentage\": 100, \"minutes\": 3215, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Genoa\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.84, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Genoa\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.94, \"fantaRatingAvg\": 5.89, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Genoa\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.99, \"fantaRatingAvg\": 5.99, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2238,9 +2270,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 33, \"starterAppearances\": 25, \"starterPercentage\": 75, \"minutes\": 2221, \"goals\": 2, \"assists\": 3, \"expectedGoals\": 0.7, \"expectedAssists\": 2.6, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 36, \"starterAppearances\": 35, \"starterPercentage\": 97, \"minutes\": 2769, \"goals\": 3, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Juventus\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.83, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Juventus\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.93, \"fantaRatingAvg\": 5.88, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Juventus\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.98, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2264,9 +2296,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 2, \"starterAppearances\": 0, \"starterPercentage\": 0, \"minutes\": 96, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 37, \"starterAppearances\": 36, \"starterPercentage\": 97, \"minutes\": 3219, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lecce\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lecce\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lecce\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2290,9 +2322,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Ramon",
             ballottaggioShare = 40,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"eng Premier League\", \"team\": \"Crystal Palace\", \"appearances\": 12, \"starterAppearances\": 12, \"starterPercentage\": 100, \"minutes\": 1060, \"goals\": 3, \"assists\": 0, \"expectedGoals\": 1.2, \"expectedAssists\": 0.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"eng Premier League\", \"team\": \"Chelsea\", \"appearances\": 34, \"starterAppearances\": 31, \"starterPercentage\": 91, \"minutes\": 2783, \"goals\": 3, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Como\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.83, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Como\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.93, \"fantaRatingAvg\": 5.88, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Como\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.98, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2316,9 +2348,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 30, \"starterAppearances\": 27, \"starterPercentage\": 90, \"minutes\": 2327, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 1.0, \"expectedAssists\": 0.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 10, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 28, \"starterAppearances\": 20, \"starterPercentage\": 71, \"minutes\": 1970, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Atalanta\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Atalanta\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Atalanta\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Infortunato",
             injuryNotes = "Operato dopo lesione muscolare",
             expectedReturnDate = "Rientro inizio ottobre"
@@ -2342,9 +2374,9 @@ object PreloadedPlayersData {
             isCornerTaker = true,
             ballottaggioRival = "Bellanova",
             ballottaggioShare = 55,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 30, \"starterAppearances\": 26, \"starterPercentage\": 86, \"minutes\": 2067, \"goals\": 4, \"assists\": 2, \"expectedGoals\": 2.2, \"expectedAssists\": 2.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 35, \"starterAppearances\": 30, \"starterPercentage\": 85, \"minutes\": 2569, \"goals\": 3, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Atalanta\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Atalanta\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Atalanta\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2368,9 +2400,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 32, \"starterAppearances\": 29, \"starterPercentage\": 90, \"minutes\": 2614, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.6, \"expectedAssists\": 0.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 8, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 29, \"starterAppearances\": 26, \"starterPercentage\": 89, \"minutes\": 2287, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Juventus\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Juventus\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Juventus\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2394,9 +2426,9 @@ object PreloadedPlayersData {
             isCornerTaker = true,
             ballottaggioRival = "Heggem",
             ballottaggioShare = 65,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 31, \"starterAppearances\": 25, \"starterPercentage\": 80, \"minutes\": 2277, \"goals\": 0, \"assists\": 6, \"expectedGoals\": 0.7, \"expectedAssists\": 6.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 32, \"starterAppearances\": 29, \"starterPercentage\": 90, \"minutes\": 2573, \"goals\": 1, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Bologna\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.83, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Bologna\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.93, \"fantaRatingAvg\": 5.88, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Bologna\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.98, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2420,9 +2452,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Cagliari\", \"appearances\": 31, \"starterAppearances\": 31, \"starterPercentage\": 100, \"minutes\": 2569, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 2.3, \"expectedAssists\": 0.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Cagliari\", \"appearances\": 26, \"starterAppearances\": 26, \"starterPercentage\": 100, \"minutes\": 2150, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Cagliari\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Cagliari\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Cagliari\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 1, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2446,9 +2478,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 22, \"starterAppearances\": 14, \"starterPercentage\": 63, \"minutes\": 1266, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.8, \"expectedAssists\": 1.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"eng Premier League\", \"team\": \"Bournemouth\", \"appearances\": 31, \"starterAppearances\": 26, \"starterPercentage\": 83, \"minutes\": 2317, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 10, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Fiorentina\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.83, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Fiorentina\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.93, \"fantaRatingAvg\": 5.88, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Fiorentina\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.98, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2472,9 +2504,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 14, \"starterAppearances\": 8, \"starterPercentage\": 57, \"minutes\": 719, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 27, \"starterAppearances\": 25, \"starterPercentage\": 92, \"minutes\": 2212, \"goals\": 2, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Genoa\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Genoa\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Genoa\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2498,9 +2530,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 31, \"starterAppearances\": 27, \"starterPercentage\": 87, \"minutes\": 2256, \"goals\": 0, \"assists\": 2, \"expectedGoals\": 0.6, \"expectedAssists\": 1.6, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Juventus\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Juventus\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Juventus\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2524,9 +2556,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"de Bundesliga\", \"team\": \"Union Berlin\", \"appearances\": 34, \"starterAppearances\": 34, \"starterPercentage\": 100, \"minutes\": 3060, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 2.6, \"expectedAssists\": 1.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"de Bundesliga\", \"team\": \"Union Berlin\", \"appearances\": 34, \"starterAppearances\": 34, \"starterPercentage\": 100, \"minutes\": 3060, \"goals\": 5, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lazio\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lazio\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lazio\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2550,9 +2582,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 4, \"starterAppearances\": 1, \"starterPercentage\": 25, \"minutes\": 118, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 31, \"starterAppearances\": 27, \"starterPercentage\": 87, \"minutes\": 2441, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Milan\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Milan\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Milan\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2576,9 +2608,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Olivera",
             ballottaggioShare = 55,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 27, \"starterAppearances\": 17, \"starterPercentage\": 62, \"minutes\": 1517, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 0.8, \"expectedAssists\": 3.5, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 32, \"starterAppearances\": 22, \"starterPercentage\": 68, \"minutes\": 1901, \"goals\": 3, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Napoli\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.83, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Napoli\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.93, \"fantaRatingAvg\": 5.88, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Napoli\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.98, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2602,9 +2634,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Parma\", \"appearances\": 35, \"starterAppearances\": 34, \"starterPercentage\": 97, \"minutes\": 2951, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Parma\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Parma\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Parma\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2628,9 +2660,9 @@ object PreloadedPlayersData {
             isCornerTaker = true,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Parma\", \"appearances\": 35, \"starterAppearances\": 34, \"starterPercentage\": 97, \"minutes\": 2873, \"goals\": 2, \"assists\": 6, \"expectedGoals\": 1.8, \"expectedAssists\": 4.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 1, \"penaltiesAttempted\": 1, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Parma\", \"appearances\": 34, \"starterAppearances\": 29, \"starterPercentage\": 85, \"minutes\": 2643, \"goals\": 0, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Parma\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.83, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Parma\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.93, \"fantaRatingAvg\": 5.88, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Parma\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.98, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2654,9 +2686,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "N'Dicka",
             ballottaggioShare = 40,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"de Bundesliga\", \"team\": \"Wolfsburg\", \"appearances\": 30, \"starterAppearances\": 28, \"starterPercentage\": 93, \"minutes\": 2468, \"goals\": 0, \"assists\": 2, \"expectedGoals\": 1.0, \"expectedAssists\": 1.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"de Bundesliga\", \"team\": \"Wolfsburg\", \"appearances\": 29, \"starterAppearances\": 27, \"starterPercentage\": 93, \"minutes\": 2482, \"goals\": 4, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Roma\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Roma\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Roma\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2680,9 +2712,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 30, \"starterAppearances\": 19, \"starterPercentage\": 63, \"minutes\": 1591, \"goals\": 2, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Udinese\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Udinese\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Udinese\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2706,9 +2738,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 30, \"starterAppearances\": 25, \"starterPercentage\": 83, \"minutes\": 2001, \"goals\": 1, \"assists\": 4, \"expectedGoals\": 0.9, \"expectedAssists\": 2.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 8, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 26, \"starterAppearances\": 22, \"starterPercentage\": 84, \"minutes\": 1861, \"goals\": 0, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Udinese\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2732,9 +2764,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"de Bundesliga\", \"team\": \"Dortmund\", \"appearances\": 21, \"starterAppearances\": 8, \"starterPercentage\": 38, \"minutes\": 895, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.9, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"de Bundesliga\", \"team\": \"Dortmund\", \"appearances\": 19, \"starterAppearances\": 11, \"starterPercentage\": 57, \"minutes\": 997, \"goals\": 2, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Como\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.83, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Como\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.93, \"fantaRatingAvg\": 5.88, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Como\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.98, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2758,9 +2790,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Cagliari\", \"appearances\": 21, \"starterAppearances\": 13, \"starterPercentage\": 61, \"minutes\": 1077, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 0.9, \"expectedAssists\": 0.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Cagliari\", \"appearances\": 35, \"starterAppearances\": 33, \"starterPercentage\": 94, \"minutes\": 2771, \"goals\": 0, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 10, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Cagliari\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Cagliari\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Cagliari\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2784,9 +2816,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Como\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Como\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Como\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2810,9 +2842,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"eng Premier League\", \"team\": \"Tottenham\", \"appearances\": 16, \"starterAppearances\": 14, \"starterPercentage\": 87, \"minutes\": 1252, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.1, \"expectedAssists\": 0.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"eng Premier League\", \"team\": \"Tottenham Hotspur\", \"appearances\": 10, \"starterAppearances\": 5, \"starterPercentage\": 50, \"minutes\": 517, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Fiorentina\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.83, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Fiorentina\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.93, \"fantaRatingAvg\": 5.88, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Fiorentina\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.98, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2836,9 +2868,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Dimarco",
             ballottaggioShare = 30,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 28, \"starterAppearances\": 15, \"starterPercentage\": 53, \"minutes\": 1625, \"goals\": 3, \"assists\": 2, \"expectedGoals\": 2.8, \"expectedAssists\": 1.6, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 34, \"starterAppearances\": 18, \"starterPercentage\": 52, \"minutes\": 1763, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Inter\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.83, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Inter\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.93, \"fantaRatingAvg\": 5.88, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Inter\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.98, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2862,9 +2894,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 32, \"starterAppearances\": 31, \"starterPercentage\": 96, \"minutes\": 2672, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 2.4, \"expectedAssists\": 0.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 2, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 32, \"starterAppearances\": 31, \"starterPercentage\": 96, \"minutes\": 2666, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lazio\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lazio\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lazio\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2888,9 +2920,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Tomori",
             ballottaggioShare = 55,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 26, \"starterAppearances\": 24, \"starterPercentage\": 92, \"minutes\": 2152, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 1.1, \"expectedAssists\": 0.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 30, \"starterAppearances\": 28, \"starterPercentage\": 93, \"minutes\": 2530, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Milan\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.83, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Milan\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.93, \"fantaRatingAvg\": 5.88, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Milan\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.98, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2914,9 +2946,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Gabbia",
             ballottaggioShare = 45,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 22, \"starterAppearances\": 19, \"starterPercentage\": 86, \"minutes\": 1593, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.1, \"expectedAssists\": 0.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 33, \"starterAppearances\": 31, \"starterPercentage\": 93, \"minutes\": 2554, \"goals\": 0, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 8, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Milan\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Milan\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Milan\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2940,9 +2972,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 22, \"starterAppearances\": 22, \"starterPercentage\": 100, \"minutes\": 1924, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.8, \"expectedAssists\": 0.6, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 33, \"starterAppearances\": 28, \"starterPercentage\": 84, \"minutes\": 2521, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Napoli\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Napoli\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Napoli\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Infortunato",
             injuryNotes = "Infortunio al menisco",
             expectedReturnDate = "Rientro novembre"
@@ -2966,9 +2998,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Venezia\", \"appearances\": 35, \"starterAppearances\": 35, \"starterPercentage\": 100, \"minutes\": 3127, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 1.8, \"expectedAssists\": 0.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Sassuolo\", \"appearances\": 35, \"starterAppearances\": 35, \"starterPercentage\": 100, \"minutes\": 3061, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Sassuolo\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Sassuolo\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Sassuolo\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -2992,9 +3024,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Torino\", \"appearances\": 32, \"starterAppearances\": 32, \"starterPercentage\": 100, \"minutes\": 2845, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 1.2, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 10, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Torino\", \"appearances\": 35, \"starterAppearances\": 35, \"starterPercentage\": 100, \"minutes\": 3088, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Torino\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3018,9 +3050,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Empoli\", \"appearances\": 29, \"starterAppearances\": 29, \"starterPercentage\": 100, \"minutes\": 2508, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Torino\", \"appearances\": 25, \"starterAppearances\": 21, \"starterPercentage\": 84, \"minutes\": 1906, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Torino\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3044,9 +3076,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 24, \"starterAppearances\": 19, \"starterPercentage\": 79, \"minutes\": 1754, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.9, \"expectedAssists\": 0.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 28, \"starterAppearances\": 28, \"starterPercentage\": 100, \"minutes\": 2472, \"goals\": 3, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Atalanta\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Atalanta\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Atalanta\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Infortunato",
             injuryNotes = "Problema a una caviglia",
             expectedReturnDate = "Da valutare"
@@ -3070,9 +3102,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"eng Premier League\", \"team\": \"Chelsea\", \"appearances\": 5, \"starterAppearances\": 3, \"starterPercentage\": 60, \"minutes\": 334, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"eng Premier League\", \"team\": \"Chelsea\", \"appearances\": 8, \"starterAppearances\": 6, \"starterPercentage\": 75, \"minutes\": 471, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Napoli\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Napoli\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Napoli\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3096,9 +3128,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lazio\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lazio\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lazio\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3122,9 +3154,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 6, \"starterAppearances\": 3, \"starterPercentage\": 50, \"minutes\": 270, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 22, \"starterAppearances\": 15, \"starterPercentage\": 68, \"minutes\": 1377, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Atalanta\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Atalanta\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Atalanta\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Infortunato",
             injuryNotes = "Distrazione agli adduttori",
             expectedReturnDate = "Rientro fine agosto"
@@ -3148,9 +3180,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Zappacosta",
             ballottaggioShare = 45,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 34, \"starterAppearances\": 27, \"starterPercentage\": 79, \"minutes\": 2402, \"goals\": 0, \"assists\": 9, \"expectedGoals\": 1.1, \"expectedAssists\": 4.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 24, \"starterAppearances\": 15, \"starterPercentage\": 62, \"minutes\": 1377, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Atalanta\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Atalanta\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Atalanta\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3174,9 +3206,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 73, \"minutes\": 1572, \"goals\": 0, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Atalanta\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Atalanta\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Atalanta\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3200,9 +3232,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 27, \"starterAppearances\": 23, \"starterPercentage\": 85, \"minutes\": 2113, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Bologna\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Bologna\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Bologna\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3226,9 +3258,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Cagliari\", \"appearances\": 35, \"starterAppearances\": 33, \"starterPercentage\": 94, \"minutes\": 2713, \"goals\": 6, \"assists\": 2, \"expectedGoals\": 3.1, \"expectedAssists\": 2.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 32, \"starterAppearances\": 16, \"starterPercentage\": 50, \"minutes\": 1819, \"goals\": 0, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Bologna\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Bologna\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Bologna\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3252,9 +3284,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 15, \"starterAppearances\": 12, \"starterPercentage\": 80, \"minutes\": 1030, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 28, \"starterAppearances\": 23, \"starterPercentage\": 82, \"minutes\": 2026, \"goals\": 1, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Como\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Como\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Como\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3278,9 +3310,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"es La Liga\", \"team\": \"Real Madrid\", \"appearances\": 1, \"starterAppearances\": 1, \"starterPercentage\": 100, \"minutes\": 77, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Fiorentina\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Fiorentina\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Fiorentina\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3304,9 +3336,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Fiorentina\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Fiorentina\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Fiorentina\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3330,9 +3362,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Frosinone\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3356,9 +3388,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 2, \"starterAppearances\": 1, \"starterPercentage\": 50, \"minutes\": 46, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 32, \"starterAppearances\": 29, \"starterPercentage\": 90, \"minutes\": 2597, \"goals\": 0, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Genoa\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3382,9 +3414,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Bisseck",
             ballottaggioShare = 40,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 23, \"starterAppearances\": 18, \"starterPercentage\": 78, \"minutes\": 1584, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.5, \"expectedAssists\": 0.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 1, \"starterAppearances\": 1, \"starterPercentage\": 100, \"minutes\": 90, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Inter\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Inter\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Inter\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3408,9 +3440,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 23, \"starterAppearances\": 22, \"starterPercentage\": 95, \"minutes\": 1686, \"goals\": 0, \"assists\": 8, \"expectedGoals\": 1.1, \"expectedAssists\": 4.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 73, \"minutes\": 1473, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lazio\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lazio\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lazio\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3434,9 +3466,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 35, \"starterAppearances\": 26, \"starterPercentage\": 74, \"minutes\": 2337, \"goals\": 4, \"assists\": 0, \"expectedGoals\": 2.0, \"expectedAssists\": 0.6, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 33, \"starterAppearances\": 32, \"starterPercentage\": 96, \"minutes\": 2778, \"goals\": 1, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lazio\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lazio\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lazio\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Infortunato",
             injuryNotes = "Problema muscolare",
             expectedReturnDate = "Da valutare"
@@ -3460,9 +3492,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lecce\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lecce\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lecce\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3486,9 +3518,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 13, \"starterAppearances\": 2, \"starterPercentage\": 15, \"minutes\": 374, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.6, \"expectedAssists\": 0.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 36, \"starterAppearances\": 33, \"starterPercentage\": 91, \"minutes\": 3020, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 9, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lecce\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lecce\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lecce\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3512,9 +3544,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 31, \"starterAppearances\": 31, \"starterPercentage\": 100, \"minutes\": 2609, \"goals\": 0, \"assists\": 2, \"expectedGoals\": 0.3, \"expectedAssists\": 2.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 37, \"starterAppearances\": 34, \"starterPercentage\": 91, \"minutes\": 3056, \"goals\": 0, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lecce\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lecce\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lecce\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Infortunato",
             injuryNotes = "Problema allo zigomo",
             expectedReturnDate = "Da valutare"
@@ -3538,9 +3570,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Monza\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Monza\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Monza\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3564,9 +3596,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 35, \"starterAppearances\": 33, \"starterPercentage\": 94, \"minutes\": 3012, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 1.5, \"expectedAssists\": 0.9, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 24, \"starterAppearances\": 18, \"starterPercentage\": 75, \"minutes\": 1681, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Napoli\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Napoli\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Napoli\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3590,9 +3622,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 32, \"starterAppearances\": 23, \"starterPercentage\": 71, \"minutes\": 2110, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.6, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 27, \"starterAppearances\": 18, \"starterPercentage\": 66, \"minutes\": 1696, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Torino\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Infortunato",
             injuryNotes = "Infortunio muscolare",
             expectedReturnDate = "Da valutare"
@@ -3616,9 +3648,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"eng Premier League\", \"team\": \"Southampton\", \"appearances\": 4, \"starterAppearances\": 2, \"starterPercentage\": 50, \"minutes\": 331, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Hellas Verona\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"minutes\": 1347, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Venezia\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3642,9 +3674,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Torino\", \"appearances\": 16, \"starterAppearances\": 14, \"starterPercentage\": 87, \"minutes\": 1116, \"goals\": 1, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Sassuolo\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Sassuolo\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Sassuolo\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3668,9 +3700,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 23, \"starterAppearances\": 23, \"starterPercentage\": 100, \"minutes\": 1903, \"goals\": 0, \"assists\": 2, \"expectedGoals\": 0.8, \"expectedAssists\": 1.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 19, \"starterAppearances\": 15, \"starterPercentage\": 78, \"minutes\": 1212, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Atalanta\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Atalanta\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Atalanta\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3694,9 +3726,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"minutes\": 1325, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Bologna\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Bologna\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Bologna\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3720,9 +3752,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 21, \"starterAppearances\": 12, \"starterPercentage\": 57, \"minutes\": 1137, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 0.6, \"expectedAssists\": 0.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 11, \"starterAppearances\": 8, \"starterPercentage\": 72, \"minutes\": 655, \"goals\": 1, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Bologna\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Bologna\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Bologna\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3746,9 +3778,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Cagliari\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Cagliari\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Cagliari\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3772,9 +3804,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Cagliari\", \"appearances\": 23, \"starterAppearances\": 20, \"starterPercentage\": 86, \"minutes\": 1699, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Cagliari\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Cagliari\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Cagliari\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3798,9 +3830,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 31, \"starterAppearances\": 30, \"starterPercentage\": 96, \"minutes\": 2615, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 1.6, \"expectedAssists\": 1.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 34, \"starterAppearances\": 27, \"starterPercentage\": 79, \"minutes\": 2326, \"goals\": 4, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Como\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Como\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Como\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3824,9 +3856,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 25, \"starterAppearances\": 11, \"starterPercentage\": 44, \"minutes\": 1049, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 23, \"starterAppearances\": 18, \"starterPercentage\": 78, \"minutes\": 1520, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Fiorentina\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Fiorentina\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Fiorentina\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Infortunato",
             injuryNotes = "Lesione legamento crociato anteriore",
             expectedReturnDate = "Rientro novembre/dicembre"
@@ -3850,9 +3882,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Frosinone\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3876,9 +3908,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Frosinone\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3902,9 +3934,9 @@ object PreloadedPlayersData {
             isCornerTaker = true,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 36, \"starterAppearances\": 35, \"starterPercentage\": 97, \"minutes\": 3085, \"goals\": 0, \"assists\": 8, \"expectedGoals\": 0.9, \"expectedAssists\": 5.5, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 33, \"starterAppearances\": 26, \"starterPercentage\": 78, \"minutes\": 2156, \"goals\": 1, \"assists\": 5, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 1, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Genoa\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3928,9 +3960,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 12, \"starterAppearances\": 11, \"starterPercentage\": 91, \"minutes\": 1013, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.4, \"expectedAssists\": 0.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 35, \"starterAppearances\": 33, \"starterPercentage\": 94, \"minutes\": 2996, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Juventus\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Juventus\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Juventus\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3954,9 +3986,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"es La Liga\", \"team\": \"Villarreal\", \"appearances\": 12, \"starterAppearances\": 4, \"starterPercentage\": 33, \"minutes\": 460, \"goals\": 0, \"assists\": 2, \"expectedGoals\": 0.5, \"expectedAssists\": 1.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"es La Liga\", \"team\": \"Villarreal\", \"appearances\": 27, \"starterAppearances\": 19, \"starterPercentage\": 70, \"minutes\": 1689, \"goals\": 1, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 8, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lazio\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lazio\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lazio\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -3980,9 +4012,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 21, \"starterAppearances\": 18, \"starterPercentage\": 85, \"minutes\": 1701, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lecce\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lecce\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lecce\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4006,9 +4038,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Spinazzola",
             ballottaggioShare = 45,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 32, \"starterAppearances\": 26, \"starterPercentage\": 81, \"minutes\": 2370, \"goals\": 0, \"assists\": 2, \"expectedGoals\": 1.1, \"expectedAssists\": 1.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 25, \"starterAppearances\": 15, \"starterPercentage\": 60, \"minutes\": 1370, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Napoli\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Napoli\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Napoli\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4032,9 +4064,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 14, \"starterAppearances\": 5, \"starterPercentage\": 35, \"minutes\": 469, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.3, \"expectedAssists\": 0.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 24, \"starterAppearances\": 12, \"starterPercentage\": 50, \"minutes\": 1184, \"goals\": 1, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Roma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Roma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Roma\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Infortunato",
             injuryNotes = "Affaticamento muscolare",
             expectedReturnDate = "Da valutare"
@@ -4058,9 +4090,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Torino\", \"appearances\": 29, \"starterAppearances\": 15, \"starterPercentage\": 51, \"minutes\": 1362, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.6, \"expectedAssists\": 0.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Torino\", \"appearances\": 29, \"starterAppearances\": 23, \"starterPercentage\": 79, \"minutes\": 2134, \"goals\": 1, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Torino\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4084,9 +4116,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 4, \"starterAppearances\": 2, \"starterPercentage\": 50, \"minutes\": 144, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"es La Liga\", \"team\": \"Levante\", \"appearances\": 28, \"starterAppearances\": 27, \"starterPercentage\": 96, \"minutes\": 2252, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 8, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Venezia\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4110,9 +4142,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"es La Liga\", \"team\": \"Valencia\", \"appearances\": 11, \"starterAppearances\": 9, \"starterPercentage\": 81, \"minutes\": 768, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"es La Liga\", \"team\": \"Valencia\", \"appearances\": 24, \"starterAppearances\": 17, \"starterPercentage\": 70, \"minutes\": 1392, \"goals\": 0, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Venezia\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4136,9 +4168,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Venezia\", \"appearances\": 25, \"starterAppearances\": 14, \"starterPercentage\": 56, \"minutes\": 1369, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 1.2, \"expectedAssists\": 0.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Venezia\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4162,9 +4194,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 16, \"starterAppearances\": 2, \"starterPercentage\": 12, \"minutes\": 541, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Torino\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4188,9 +4220,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Sassuolo\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4214,9 +4246,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Cagliari\", \"appearances\": 17, \"starterAppearances\": 16, \"starterPercentage\": 94, \"minutes\": 1310, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Cagliari\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Cagliari\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Cagliari\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4240,9 +4272,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Cagliari\", \"appearances\": 37, \"starterAppearances\": 35, \"starterPercentage\": 94, \"minutes\": 3060, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 0.9, \"expectedAssists\": 3.6, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Cagliari\", \"appearances\": 31, \"starterAppearances\": 18, \"starterPercentage\": 58, \"minutes\": 1597, \"goals\": 0, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Cagliari\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Cagliari\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Cagliari\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4266,9 +4298,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 9, \"starterAppearances\": 7, \"starterPercentage\": 77, \"minutes\": 630, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.4, \"expectedAssists\": 0.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 28, \"starterAppearances\": 19, \"starterPercentage\": 67, \"minutes\": 1662, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 8, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Como\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Como\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Como\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4292,9 +4324,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"minutes\": 1292, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.2, \"expectedAssists\": 0.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 35, \"starterAppearances\": 33, \"starterPercentage\": 94, \"minutes\": 2918, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 12, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Fiorentina\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Fiorentina\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Fiorentina\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4318,9 +4350,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Frosinone\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4344,9 +4376,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Genoa\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4370,9 +4402,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Kalulu",
             ballottaggioShare = 35,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 30, \"starterAppearances\": 26, \"starterPercentage\": 86, \"minutes\": 2195, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 2.5, \"expectedAssists\": 0.5, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 21, \"starterAppearances\": 12, \"starterPercentage\": 57, \"minutes\": 1093, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Juventus\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Juventus\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Juventus\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Infortunato",
             injuryNotes = "Problema alla caviglia",
             expectedReturnDate = "Da valutare"
@@ -4396,9 +4428,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 25, \"starterAppearances\": 23, \"starterPercentage\": 92, \"minutes\": 2135, \"goals\": 3, \"assists\": 0, \"expectedGoals\": 2.1, \"expectedAssists\": 0.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 26, \"starterAppearances\": 19, \"starterPercentage\": 73, \"minutes\": 1800, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Milan\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Milan\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Milan\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4422,9 +4454,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"eng Premier League\", \"team\": \"Brighton\", \"appearances\": 30, \"starterAppearances\": 26, \"starterPercentage\": 86, \"minutes\": 2402, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 1.2, \"expectedAssists\": 2.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 19, \"starterAppearances\": 13, \"starterPercentage\": 68, \"minutes\": 1034, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Milan\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Milan\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Milan\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4448,9 +4480,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Monza\", \"appearances\": 21, \"starterAppearances\": 18, \"starterPercentage\": 85, \"minutes\": 1468, \"goals\": 3, \"assists\": 0, \"expectedGoals\": 2.1, \"expectedAssists\": 1.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Monza\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4474,9 +4506,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Monza\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4500,9 +4532,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Monza\", \"appearances\": 21, \"starterAppearances\": 18, \"starterPercentage\": 85, \"minutes\": 1468, \"goals\": 3, \"assists\": 0, \"expectedGoals\": 2.1, \"expectedAssists\": 1.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Monza\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4526,9 +4558,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Parma\", \"appearances\": 21, \"starterAppearances\": 18, \"starterPercentage\": 85, \"minutes\": 1625, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 8, \"redCards\": 2, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Parma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Parma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Parma\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4552,9 +4584,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Parma\", \"appearances\": 21, \"starterAppearances\": 16, \"starterPercentage\": 76, \"minutes\": 1288, \"goals\": 0, \"assists\": 3, \"expectedGoals\": 2.4, \"expectedAssists\": 1.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Parma\", \"appearances\": 27, \"starterAppearances\": 25, \"starterPercentage\": 92, \"minutes\": 2252, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Parma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Parma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Parma\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4578,9 +4610,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Hellas Verona\", \"appearances\": 24, \"starterAppearances\": 21, \"starterPercentage\": 87, \"minutes\": 2029, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.6, \"expectedAssists\": 0.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 23, \"starterAppearances\": 9, \"starterPercentage\": 39, \"minutes\": 1097, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Roma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Roma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Roma\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4604,9 +4636,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Sassuolo\", \"appearances\": 34, \"starterAppearances\": 33, \"starterPercentage\": 97, \"minutes\": 2852, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Sassuolo\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4630,9 +4662,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Sassuolo\", \"appearances\": 30, \"starterAppearances\": 22, \"starterPercentage\": 73, \"minutes\": 1917, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Sassuolo\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4656,9 +4688,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"es La Liga\", \"team\": \"Valladolid\", \"appearances\": 25, \"starterAppearances\": 21, \"starterPercentage\": 84, \"minutes\": 1779, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.9, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"es La Liga\", \"team\": \"Valencia\", \"appearances\": 17, \"starterAppearances\": 15, \"starterPercentage\": 88, \"minutes\": 1337, \"goals\": 2, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Torino\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4682,9 +4714,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 16, \"starterAppearances\": 12, \"starterPercentage\": 75, \"minutes\": 1161, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 1.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 30, \"starterAppearances\": 28, \"starterPercentage\": 93, \"minutes\": 2247, \"goals\": 3, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Udinese\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Squalificato",
             injuryNotes = "1 giornata - Salta Monza (2Âª)",
             expectedReturnDate = "Prossima giornata"
@@ -4708,9 +4740,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 28, \"starterAppearances\": 18, \"starterPercentage\": 64, \"minutes\": 1763, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Udinese\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4734,9 +4766,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 31, \"starterAppearances\": 19, \"starterPercentage\": 61, \"minutes\": 1711, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.4, \"expectedAssists\": 1.6, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 19, \"starterAppearances\": 16, \"starterPercentage\": 84, \"minutes\": 1280, \"goals\": 1, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Udinese\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Infortunato",
             injuryNotes = "Recupero dall'infortunio al crociato",
             expectedReturnDate = "Rientro metÃ -fine settembre"
@@ -4760,9 +4792,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 10, \"starterAppearances\": 1, \"starterPercentage\": 10, \"minutes\": 191, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Udinese\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4786,9 +4818,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Venezia\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4812,9 +4844,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Frosinone\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4838,9 +4870,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Napoli\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Napoli\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Napoli\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4864,9 +4896,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 18, \"starterAppearances\": 12, \"starterPercentage\": 66, \"minutes\": 1125, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 19, \"starterAppearances\": 10, \"starterPercentage\": 52, \"minutes\": 988, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Atalanta\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Atalanta\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Atalanta\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4890,9 +4922,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 15, \"starterAppearances\": 9, \"starterPercentage\": 60, \"minutes\": 900, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.5, \"expectedAssists\": 0.5, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 12, \"starterAppearances\": 8, \"starterPercentage\": 66, \"minutes\": 678, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Bologna\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Bologna\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Bologna\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4916,9 +4948,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 6, \"starterAppearances\": 6, \"starterPercentage\": 100, \"minutes\": 484, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Bologna\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Bologna\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Bologna\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4942,9 +4974,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Cagliari\", \"appearances\": 23, \"starterAppearances\": 4, \"starterPercentage\": 17, \"minutes\": 783, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Cagliari\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Cagliari\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Cagliari\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Infortunato",
             injuryNotes = "Lesione del legamento crociato anteriore",
             expectedReturnDate = "Rientro settembre/ottobre"
@@ -4968,9 +5000,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 35, \"starterAppearances\": 34, \"starterPercentage\": 97, \"minutes\": 2981, \"goals\": 0, \"assists\": 3, \"expectedGoals\": 1.1, \"expectedAssists\": 1.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 34, \"starterAppearances\": 29, \"starterPercentage\": 85, \"minutes\": 2458, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 8, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Fiorentina\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Fiorentina\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Fiorentina\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -4994,9 +5026,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Fiorentina\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Fiorentina\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Fiorentina\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5020,9 +5052,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"de Bundesliga\", \"team\": \"Hoffenheim\", \"appearances\": 32, \"starterAppearances\": 23, \"starterPercentage\": 71, \"minutes\": 2220, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.1, \"expectedAssists\": 0.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"de Bundesliga\", \"team\": \"Hoffenheim\", \"appearances\": 8, \"starterAppearances\": 1, \"starterPercentage\": 12, \"minutes\": 61, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Frosinone\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5046,9 +5078,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Frosinone\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5072,9 +5104,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lazio\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.89, \"fantaRatingAvg\": 5.82, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lazio\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.92, \"fantaRatingAvg\": 5.87, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lazio\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.97, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5098,9 +5130,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lazio\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lazio\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lazio\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5124,9 +5156,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 3, \"starterAppearances\": 0, \"starterPercentage\": 0, \"minutes\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Monza\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5150,9 +5182,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Monza\", \"appearances\": 26, \"starterAppearances\": 25, \"starterPercentage\": 96, \"minutes\": 2191, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.3, \"expectedAssists\": 0.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Monza\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5176,9 +5208,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Parma\", \"appearances\": 29, \"starterAppearances\": 22, \"starterPercentage\": 75, \"minutes\": 2095, \"goals\": 0, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Parma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Parma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Parma\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5202,9 +5234,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Venezia\", \"appearances\": 17, \"starterAppearances\": 17, \"starterPercentage\": 100, \"minutes\": 1530, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 1.1, \"expectedAssists\": 0.6, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Sassuolo\", \"appearances\": 12, \"starterAppearances\": 5, \"starterPercentage\": 41, \"minutes\": 509, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Sassuolo\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Infortunato",
             injuryNotes = "Rottura del crociato",
             expectedReturnDate = "Rientro metÃ  settembre"
@@ -5228,9 +5260,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 1, \"starterAppearances\": 0, \"starterPercentage\": 0, \"minutes\": 5, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 5, \"starterAppearances\": 1, \"starterPercentage\": 20, \"minutes\": 120, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Udinese\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5254,9 +5286,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 2, \"starterAppearances\": 0, \"starterPercentage\": 0, \"minutes\": 90, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Udinese\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5280,9 +5312,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Venezia\", \"appearances\": 16, \"starterAppearances\": 12, \"starterPercentage\": 75, \"minutes\": 1122, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Venezia\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5306,9 +5338,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Venezia\", \"appearances\": 16, \"starterAppearances\": 12, \"starterPercentage\": 75, \"minutes\": 1117, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Venezia\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Infortunato",
             injuryNotes = "Infortunio alle anche",
             expectedReturnDate = "Rientro metÃ -fine ottobre"
@@ -5332,9 +5364,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Parma\", \"appearances\": 25, \"starterAppearances\": 10, \"starterPercentage\": 40, \"minutes\": 1206, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 0.8, \"expectedAssists\": 1.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Venezia\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5358,9 +5390,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Sassuolo\", \"appearances\": 1, \"starterAppearances\": 0, \"starterPercentage\": 0, \"minutes\": 1, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Sassuolo\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5384,9 +5416,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Bologna\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Bologna\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Bologna\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5410,9 +5442,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 20, \"starterAppearances\": 14, \"starterPercentage\": 70, \"minutes\": 1257, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.5, \"expectedAssists\": 0.5, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 20, \"starterAppearances\": 11, \"starterPercentage\": 55, \"minutes\": 931, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Como\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Como\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Como\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5436,9 +5468,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 3, \"starterPercentage\": 100, \"minutes\": 179, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 13, \"starterAppearances\": 9, \"starterPercentage\": 69, \"minutes\": 829, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Genoa\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5462,9 +5494,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Genoa\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5488,9 +5520,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 34, \"starterAppearances\": 23, \"starterPercentage\": 67, \"minutes\": 2058, \"goals\": 0, \"assists\": 2, \"expectedGoals\": 0.1, \"expectedAssists\": 1.9, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 16, \"starterAppearances\": 12, \"starterPercentage\": 75, \"minutes\": 913, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Genoa\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5514,9 +5546,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 25, \"starterAppearances\": 16, \"starterPercentage\": 64, \"minutes\": 1406, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.1, \"expectedAssists\": 1.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 23, \"starterAppearances\": 9, \"starterPercentage\": 39, \"minutes\": 938, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lazio\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lazio\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lazio\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5540,9 +5572,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 22, \"starterAppearances\": 10, \"starterPercentage\": 45, \"minutes\": 1067, \"goals\": 0, \"assists\": 4, \"expectedGoals\": 0.7, \"expectedAssists\": 1.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 24, \"starterAppearances\": 17, \"starterPercentage\": 70, \"minutes\": 1469, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 8, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lazio\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lazio\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lazio\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5566,9 +5598,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 19, \"starterAppearances\": 16, \"starterPercentage\": 84, \"minutes\": 1388, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.1, \"expectedAssists\": 0.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 7, \"starterAppearances\": 1, \"starterPercentage\": 14, \"minutes\": 197, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lecce\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lecce\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lecce\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5592,9 +5624,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 14, \"starterAppearances\": 6, \"starterPercentage\": 42, \"minutes\": 543, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lecce\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lecce\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lecce\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5618,9 +5650,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Milan\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Milan\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Milan\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5644,9 +5676,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Monza\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5670,9 +5702,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 4, \"starterAppearances\": 1, \"starterPercentage\": 25, \"minutes\": 142, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.2, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"es La Liga\", \"team\": \"Villarreal\", \"appearances\": 23, \"starterAppearances\": 21, \"starterPercentage\": 91, \"minutes\": 1979, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Napoli\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Napoli\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Napoli\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Infortunato",
             injuryNotes = "Problema fisico",
             expectedReturnDate = "Da valutare"
@@ -5696,9 +5728,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Parma\", \"appearances\": 11, \"starterAppearances\": 9, \"starterPercentage\": 81, \"minutes\": 780, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Parma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Parma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Parma\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5722,9 +5754,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Torino\", \"appearances\": 15, \"starterAppearances\": 13, \"starterPercentage\": 86, \"minutes\": 1158, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 2.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Torino\", \"appearances\": 14, \"starterAppearances\": 5, \"starterPercentage\": 35, \"minutes\": 517, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Torino\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Torino\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5748,9 +5780,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 6, \"starterAppearances\": 0, \"starterPercentage\": 0, \"minutes\": 88, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.1, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Udinese\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5774,9 +5806,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Venezia\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5800,9 +5832,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 3, \"starterPercentage\": 100, \"minutes\": 140, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.1, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Venezia\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5826,9 +5858,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"fr Ligue 1\", \"team\": \"Reims\", \"appearances\": 27, \"starterAppearances\": 24, \"starterPercentage\": 88, \"minutes\": 1970, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.3, \"expectedAssists\": 0.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"de Bundesliga\", \"team\": \"Eintracht Frankfurt\", \"appearances\": 4, \"starterAppearances\": 1, \"starterPercentage\": 25, \"minutes\": 144, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Cagliari\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.88, \"fantaRatingAvg\": 5.81, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Cagliari\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.91, \"fantaRatingAvg\": 5.86, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Cagliari\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.96, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5852,9 +5884,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Sassuolo\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5878,9 +5910,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 13, \"starterAppearances\": 6, \"starterPercentage\": 46, \"minutes\": 539, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.2, \"expectedAssists\": 0.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Cremonese\", \"appearances\": 36, \"starterAppearances\": 33, \"starterPercentage\": 91, \"minutes\": 3011, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Milan\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Milan\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Milan\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5904,9 +5936,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"minutes\": 1060, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.8, \"expectedAssists\": 0.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 12, \"starterAppearances\": 6, \"starterPercentage\": 50, \"minutes\": 491, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Bologna\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Bologna\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Bologna\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5930,9 +5962,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 32, \"starterAppearances\": 28, \"starterPercentage\": 87, \"minutes\": 2532, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 2.5, \"expectedAssists\": 0.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 12, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 2, \"starterAppearances\": 0, \"starterPercentage\": 0, \"minutes\": 15, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Como\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Como\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Como\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5956,9 +5988,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Frosinone\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -5982,9 +6014,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Frosinone\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6008,9 +6040,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Frosinone\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6034,9 +6066,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 13, \"starterAppearances\": 9, \"starterPercentage\": 69, \"minutes\": 900, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.2, \"expectedAssists\": 0.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"es La Liga\", \"team\": \"Levante\", \"appearances\": 19, \"starterAppearances\": 10, \"starterPercentage\": 52, \"minutes\": 947, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Genoa\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Genoa\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6060,9 +6092,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 6, \"starterAppearances\": 3, \"starterPercentage\": 50, \"minutes\": 250, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Juventus\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Juventus\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Juventus\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6086,9 +6118,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 7, \"starterAppearances\": 6, \"starterPercentage\": 85, \"minutes\": 460, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.1, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 12, \"starterAppearances\": 2, \"starterPercentage\": 16, \"minutes\": 296, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Juventus\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Juventus\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Juventus\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6112,9 +6144,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 10, \"starterAppearances\": 5, \"starterPercentage\": 50, \"minutes\": 607, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 1.1, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 14, \"starterAppearances\": 6, \"starterPercentage\": 42, \"minutes\": 667, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lazio\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lazio\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lazio\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6138,9 +6170,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Monza\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Monza\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6164,9 +6196,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Empoli\", \"appearances\": 18, \"starterAppearances\": 12, \"starterPercentage\": 66, \"minutes\": 1069, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.6, \"expectedAssists\": 0.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 2, \"starterAppearances\": 1, \"starterPercentage\": 50, \"minutes\": 119, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Napoli\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Napoli\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Napoli\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Infortunato",
             injuryNotes = "Lesione di alto grado del collaterale mediale del ginocchio sinistro",
             expectedReturnDate = "Rientro metÃ  ottobre"
@@ -6190,9 +6222,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 20, \"starterAppearances\": 7, \"starterPercentage\": 35, \"minutes\": 702, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 16, \"starterAppearances\": 2, \"starterPercentage\": 12, \"minutes\": 310, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Napoli\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Napoli\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Napoli\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6216,9 +6248,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Venezia\", \"appearances\": 8, \"starterAppearances\": 3, \"starterPercentage\": 37, \"minutes\": 226, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Parma\", \"appearances\": 7, \"starterAppearances\": 1, \"starterPercentage\": 14, \"minutes\": 114, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Parma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Parma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Parma\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6242,9 +6274,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 18, \"starterAppearances\": 5, \"starterPercentage\": 27, \"minutes\": 517, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Roma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Roma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Roma\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6268,9 +6300,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Sassuolo\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6294,9 +6326,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Sassuolo\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Sassuolo\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6320,9 +6352,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 7, \"starterAppearances\": 2, \"starterPercentage\": 28, \"minutes\": 166, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Udinese\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Udinese\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6346,9 +6378,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Venezia\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Venezia\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6372,9 +6404,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Frosinone\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Frosinone\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6398,9 +6430,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Roma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.87, \"fantaRatingAvg\": 5.8, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 4}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Roma\", \"appearances\": 3, \"starterAppearances\": 2, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.9, \"fantaRatingAvg\": 5.85, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 5}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Roma\", \"appearances\": 4, \"starterAppearances\": 3, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.3, \"expectedAssists\": 0.2, \"ratingAvg\": 5.95, \"fantaRatingAvg\": 5.95, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 6}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6424,9 +6456,9 @@ object PreloadedPlayersData {
             isCornerTaker = true,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 35, \"starterAppearances\": 30, \"starterPercentage\": 85, \"minutes\": 2687, \"goals\": 6, \"assists\": 8, \"expectedGoals\": 9.3, \"expectedAssists\": 6.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 1, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 35, \"starterAppearances\": 33, \"starterPercentage\": 94, \"minutes\": 2878, \"goals\": 12, \"assists\": 6, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 2, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Como\", \"appearances\": 27, \"starterAppearances\": 23, \"starterPercentage\": 87, \"goals\": 8, \"assists\": 6, \"expectedGoals\": 7.2, \"expectedAssists\": 4.8, \"ratingAvg\": 6.23, \"fantaRatingAvg\": 7.41, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 3, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Como\", \"appearances\": 29, \"starterAppearances\": 25, \"starterPercentage\": 87, \"goals\": 9, \"assists\": 6, \"expectedGoals\": 8.1, \"expectedAssists\": 4.8, \"ratingAvg\": 6.26, \"fantaRatingAvg\": 7.46, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 4, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Como\", \"appearances\": 32, \"starterAppearances\": 28, \"starterPercentage\": 87, \"goals\": 11, \"assists\": 8, \"expectedGoals\": 10.4, \"expectedAssists\": 7.2, \"ratingAvg\": 6.31, \"fantaRatingAvg\": 7.56, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 5, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6450,9 +6482,9 @@ object PreloadedPlayersData {
             isCornerTaker = true,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 28, \"starterAppearances\": 25, \"starterPercentage\": 89, \"minutes\": 1879, \"goals\": 5, \"assists\": 6, \"expectedGoals\": 4.4, \"expectedAssists\": 5.6, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 3, \"penaltiesAttempted\": 4, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 22, \"starterAppearances\": 20, \"starterPercentage\": 90, \"minutes\": 1639, \"goals\": 9, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 4, \"penaltiesAttempted\": 5, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Inter\", \"appearances\": 26, \"starterAppearances\": 22, \"starterPercentage\": 87, \"goals\": 8, \"assists\": 6, \"expectedGoals\": 7.2, \"expectedAssists\": 4.8, \"ratingAvg\": 6.21, \"fantaRatingAvg\": 7.43, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 3, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Inter\", \"appearances\": 28, \"starterAppearances\": 24, \"starterPercentage\": 87, \"goals\": 9, \"assists\": 6, \"expectedGoals\": 8.1, \"expectedAssists\": 4.8, \"ratingAvg\": 6.24, \"fantaRatingAvg\": 7.48, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 4, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Inter\", \"appearances\": 31, \"starterAppearances\": 27, \"starterPercentage\": 87, \"goals\": 11, \"assists\": 8, \"expectedGoals\": 10.4, \"expectedAssists\": 7.2, \"ratingAvg\": 6.29, \"fantaRatingAvg\": 7.58, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 5, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6476,9 +6508,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 34, \"starterAppearances\": 33, \"starterPercentage\": 97, \"minutes\": 2938, \"goals\": 12, \"assists\": 4, \"expectedGoals\": 7.4, \"expectedAssists\": 2.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 33, \"starterAppearances\": 31, \"starterPercentage\": 93, \"minutes\": 2791, \"goals\": 10, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 1, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Napoli\", \"appearances\": 26, \"starterAppearances\": 22, \"starterPercentage\": 87, \"goals\": 8, \"assists\": 6, \"expectedGoals\": 7.2, \"expectedAssists\": 4.8, \"ratingAvg\": 6.21, \"fantaRatingAvg\": 7.46, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Napoli\", \"appearances\": 28, \"starterAppearances\": 24, \"starterPercentage\": 87, \"goals\": 9, \"assists\": 6, \"expectedGoals\": 8.1, \"expectedAssists\": 4.8, \"ratingAvg\": 6.24, \"fantaRatingAvg\": 7.51, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Napoli\", \"appearances\": 31, \"starterAppearances\": 27, \"starterPercentage\": 87, \"goals\": 11, \"assists\": 8, \"expectedGoals\": 10.4, \"expectedAssists\": 7.2, \"ratingAvg\": 6.29, \"fantaRatingAvg\": 7.61, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6502,9 +6534,9 @@ object PreloadedPlayersData {
             isCornerTaker = true,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 30, \"starterAppearances\": 23, \"starterPercentage\": 76, \"minutes\": 1878, \"goals\": 15, \"assists\": 4, \"expectedGoals\": 10.1, \"expectedAssists\": 3.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 3, \"penaltiesAttempted\": 3, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 35, \"starterAppearances\": 26, \"starterPercentage\": 74, \"minutes\": 2111, \"goals\": 10, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 4, \"penaltiesAttempted\": 6, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Bologna\", \"appearances\": 25, \"starterAppearances\": 20, \"starterPercentage\": 83, \"goals\": 8, \"assists\": 5, \"expectedGoals\": 7.2, \"expectedAssists\": 4.0, \"ratingAvg\": 6.16, \"fantaRatingAvg\": 7.29, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 3, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Bologna\", \"appearances\": 27, \"starterAppearances\": 22, \"starterPercentage\": 83, \"goals\": 9, \"assists\": 5, \"expectedGoals\": 8.1, \"expectedAssists\": 4.0, \"ratingAvg\": 6.19, \"fantaRatingAvg\": 7.34, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 4, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Bologna\", \"appearances\": 30, \"starterAppearances\": 25, \"starterPercentage\": 83, \"goals\": 10, \"assists\": 7, \"expectedGoals\": 9.5, \"expectedAssists\": 6.4, \"ratingAvg\": 6.24, \"fantaRatingAvg\": 7.44, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 5, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6528,9 +6560,9 @@ object PreloadedPlayersData {
             isCornerTaker = true,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 34, \"starterAppearances\": 29, \"starterPercentage\": 85, \"minutes\": 2478, \"goals\": 11, \"assists\": 9, \"expectedGoals\": 12.0, \"expectedAssists\": 6.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 3, \"penaltiesAttempted\": 4, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 30, \"starterAppearances\": 18, \"starterPercentage\": 60, \"minutes\": 1609, \"goals\": 8, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 1, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Milan\", \"appearances\": 25, \"starterAppearances\": 20, \"starterPercentage\": 83, \"goals\": 8, \"assists\": 5, \"expectedGoals\": 7.2, \"expectedAssists\": 4.0, \"ratingAvg\": 6.12, \"fantaRatingAvg\": 7.25, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 3, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Milan\", \"appearances\": 27, \"starterAppearances\": 22, \"starterPercentage\": 83, \"goals\": 9, \"assists\": 5, \"expectedGoals\": 8.1, \"expectedAssists\": 4.0, \"ratingAvg\": 6.15, \"fantaRatingAvg\": 7.3, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 4, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Milan\", \"appearances\": 30, \"starterAppearances\": 25, \"starterPercentage\": 83, \"goals\": 10, \"assists\": 7, \"expectedGoals\": 9.5, \"expectedAssists\": 6.4, \"ratingAvg\": 6.2, \"fantaRatingAvg\": 7.4, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 5, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6554,9 +6586,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Loftus-Cheek",
             ballottaggioShare = 70,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"fr Ligue 1\", \"team\": \"Marseille\", \"appearances\": 29, \"starterAppearances\": 27, \"starterPercentage\": 93, \"minutes\": 2485, \"goals\": 9, \"assists\": 4, \"expectedGoals\": 7.3, \"expectedAssists\": 3.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 29, \"starterAppearances\": 28, \"starterPercentage\": 96, \"minutes\": 2550, \"goals\": 6, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Milan\", \"appearances\": 24, \"starterAppearances\": 19, \"starterPercentage\": 82, \"goals\": 7, \"assists\": 5, \"expectedGoals\": 6.3, \"expectedAssists\": 4.0, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 7.2, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Milan\", \"appearances\": 26, \"starterAppearances\": 21, \"starterPercentage\": 82, \"goals\": 8, \"assists\": 5, \"expectedGoals\": 7.2, \"expectedAssists\": 4.0, \"ratingAvg\": 6.13, \"fantaRatingAvg\": 7.25, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Milan\", \"appearances\": 29, \"starterAppearances\": 24, \"starterPercentage\": 82, \"goals\": 9, \"assists\": 7, \"expectedGoals\": 8.6, \"expectedAssists\": 6.4, \"ratingAvg\": 6.18, \"fantaRatingAvg\": 7.35, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6580,9 +6612,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Nico Paz",
             ballottaggioShare = 35,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 29, \"starterAppearances\": 17, \"starterPercentage\": 58, \"minutes\": 1569, \"goals\": 6, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Como\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 78, \"goals\": 6, \"assists\": 4, \"expectedGoals\": 5.4, \"expectedAssists\": 3.2, \"ratingAvg\": 6.04, \"fantaRatingAvg\": 7.04, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Como\", \"appearances\": 25, \"starterAppearances\": 19, \"starterPercentage\": 78, \"goals\": 7, \"assists\": 5, \"expectedGoals\": 6.3, \"expectedAssists\": 4.0, \"ratingAvg\": 6.07, \"fantaRatingAvg\": 7.09, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Como\", \"appearances\": 28, \"starterAppearances\": 22, \"starterPercentage\": 78, \"goals\": 8, \"assists\": 6, \"expectedGoals\": 7.7, \"expectedAssists\": 5.5, \"ratingAvg\": 6.12, \"fantaRatingAvg\": 7.19, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6606,9 +6638,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Pellegrini Lo.",
             ballottaggioShare = 60,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Roma\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.04, \"fantaRatingAvg\": 6.08, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Roma\", \"appearances\": 25, \"starterAppearances\": 19, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.07, \"fantaRatingAvg\": 6.13, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Roma\", \"appearances\": 28, \"starterAppearances\": 22, \"starterPercentage\": 78, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 1.4, \"expectedAssists\": 0.4, \"ratingAvg\": 6.12, \"fantaRatingAvg\": 6.23, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6632,9 +6664,9 @@ object PreloadedPlayersData {
             isCornerTaker = true,
             ballottaggioRival = "Rodriguez Je.",
             ballottaggioShare = 70,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 36, \"starterAppearances\": 30, \"starterPercentage\": 83, \"minutes\": 2613, \"goals\": 3, \"assists\": 2, \"expectedGoals\": 2.0, \"expectedAssists\": 3.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 36, \"starterAppearances\": 31, \"starterPercentage\": 86, \"minutes\": 2739, \"goals\": 6, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 4, \"penaltiesAttempted\": 4, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Como\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 78, \"goals\": 6, \"assists\": 4, \"expectedGoals\": 5.4, \"expectedAssists\": 3.2, \"ratingAvg\": 6.03, \"fantaRatingAvg\": 7.02, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Como\", \"appearances\": 25, \"starterAppearances\": 19, \"starterPercentage\": 78, \"goals\": 7, \"assists\": 5, \"expectedGoals\": 6.3, \"expectedAssists\": 4.0, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 7.07, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Como\", \"appearances\": 28, \"starterAppearances\": 22, \"starterPercentage\": 78, \"goals\": 8, \"assists\": 6, \"expectedGoals\": 7.7, \"expectedAssists\": 5.5, \"ratingAvg\": 6.11, \"fantaRatingAvg\": 7.17, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 1, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6658,9 +6690,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 32, \"starterAppearances\": 28, \"starterPercentage\": 87, \"minutes\": 2257, \"goals\": 5, \"assists\": 6, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 8, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Udinese\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 78, \"goals\": 6, \"assists\": 4, \"expectedGoals\": 5.4, \"expectedAssists\": 3.2, \"ratingAvg\": 6.03, \"fantaRatingAvg\": 7.03, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Udinese\", \"appearances\": 25, \"starterAppearances\": 19, \"starterPercentage\": 78, \"goals\": 7, \"assists\": 5, \"expectedGoals\": 6.3, \"expectedAssists\": 4.0, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 7.08, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Udinese\", \"appearances\": 28, \"starterAppearances\": 22, \"starterPercentage\": 78, \"goals\": 8, \"assists\": 6, \"expectedGoals\": 7.7, \"expectedAssists\": 5.5, \"ratingAvg\": 6.11, \"fantaRatingAvg\": 7.18, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6684,9 +6716,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Frattesi",
             ballottaggioShare = 60,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 32, \"starterAppearances\": 28, \"starterPercentage\": 87, \"minutes\": 2456, \"goals\": 3, \"assists\": 6, \"expectedGoals\": 2.2, \"expectedAssists\": 4.5, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 34, \"starterAppearances\": 31, \"starterPercentage\": 91, \"minutes\": 2517, \"goals\": 3, \"assists\": 8, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Inter\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 6.06, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Inter\", \"appearances\": 25, \"starterAppearances\": 19, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 6.11, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Inter\", \"appearances\": 28, \"starterAppearances\": 22, \"starterPercentage\": 78, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 1.4, \"expectedAssists\": 0.4, \"ratingAvg\": 6.1, \"fantaRatingAvg\": 6.21, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6710,9 +6742,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Thuram K.",
             ballottaggioShare = 60,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 32, \"starterAppearances\": 27, \"starterPercentage\": 84, \"minutes\": 2310, \"goals\": 2, \"assists\": 4, \"expectedGoals\": 2.9, \"expectedAssists\": 3.6, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 36, \"starterAppearances\": 32, \"starterPercentage\": 88, \"minutes\": 2835, \"goals\": 5, \"assists\": 5, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Juventus\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.01, \"fantaRatingAvg\": 5.94, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Juventus\", \"appearances\": 25, \"starterAppearances\": 19, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.04, \"fantaRatingAvg\": 5.99, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Juventus\", \"appearances\": 28, \"starterAppearances\": 22, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.09, \"fantaRatingAvg\": 6.09, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6736,9 +6768,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 27, \"starterAppearances\": 12, \"starterPercentage\": 44, \"minutes\": 1251, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 1.3, \"expectedAssists\": 1.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 32, \"starterAppearances\": 29, \"starterPercentage\": 90, \"minutes\": 2557, \"goals\": 5, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Fiorentina\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.03, \"fantaRatingAvg\": 6.07, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Fiorentina\", \"appearances\": 25, \"starterAppearances\": 19, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 6.12, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Fiorentina\", \"appearances\": 28, \"starterAppearances\": 22, \"starterPercentage\": 78, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 1.4, \"expectedAssists\": 0.4, \"ratingAvg\": 6.11, \"fantaRatingAvg\": 6.22, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6762,9 +6794,9 @@ object PreloadedPlayersData {
             isCornerTaker = true,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 34, \"starterAppearances\": 33, \"starterPercentage\": 97, \"minutes\": 2686, \"goals\": 8, \"assists\": 6, \"expectedGoals\": 6.4, \"expectedAssists\": 4.6, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 10, \"redCards\": 0, \"penaltiesScored\": 2, \"penaltiesAttempted\": 2, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 26, \"starterAppearances\": 26, \"starterPercentage\": 100, \"minutes\": 2104, \"goals\": 3, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 1, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lazio\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 78, \"goals\": 6, \"assists\": 4, \"expectedGoals\": 5.4, \"expectedAssists\": 3.2, \"ratingAvg\": 6.03, \"fantaRatingAvg\": 7.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 2, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lazio\", \"appearances\": 25, \"starterAppearances\": 19, \"starterPercentage\": 78, \"goals\": 7, \"assists\": 5, \"expectedGoals\": 6.3, \"expectedAssists\": 4.0, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 7.05, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 3, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lazio\", \"appearances\": 28, \"starterAppearances\": 22, \"starterPercentage\": 78, \"goals\": 8, \"assists\": 6, \"expectedGoals\": 7.7, \"expectedAssists\": 5.5, \"ratingAvg\": 6.11, \"fantaRatingAvg\": 7.15, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 4, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6788,9 +6820,9 @@ object PreloadedPlayersData {
             isCornerTaker = true,
             ballottaggioRival = "Anguissa",
             ballottaggioShare = 70,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"eng Premier League\", \"team\": \"Manchester City\", \"appearances\": 28, \"starterAppearances\": 19, \"starterPercentage\": 67, \"minutes\": 1702, \"goals\": 4, \"assists\": 7, \"expectedGoals\": 5.1, \"expectedAssists\": 8.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"minutes\": 1165, \"goals\": 5, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 3, \"penaltiesAttempted\": 3, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Napoli\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 78, \"goals\": 7, \"assists\": 4, \"expectedGoals\": 6.3, \"expectedAssists\": 3.2, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 7.15, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Napoli\", \"appearances\": 25, \"starterAppearances\": 19, \"starterPercentage\": 78, \"goals\": 8, \"assists\": 5, \"expectedGoals\": 7.2, \"expectedAssists\": 4.0, \"ratingAvg\": 6.08, \"fantaRatingAvg\": 7.2, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Napoli\", \"appearances\": 28, \"starterAppearances\": 22, \"starterPercentage\": 78, \"goals\": 9, \"assists\": 6, \"expectedGoals\": 8.6, \"expectedAssists\": 5.5, \"ratingAvg\": 6.13, \"fantaRatingAvg\": 7.3, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 1, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6814,9 +6846,9 @@ object PreloadedPlayersData {
             isCornerTaker = true,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 24, \"starterAppearances\": 16, \"starterPercentage\": 66, \"minutes\": 1273, \"goals\": 6, \"assists\": 1, \"expectedGoals\": 4.5, \"expectedAssists\": 1.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 2, \"penaltiesAttempted\": 2, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 33, \"starterAppearances\": 27, \"starterPercentage\": 81, \"minutes\": 2250, \"goals\": 5, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 1, \"penaltiesScored\": 3, \"penaltiesAttempted\": 3, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Fiorentina\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.9, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Fiorentina\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 5.95, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Fiorentina\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 6.05, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6840,9 +6872,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 17, \"starterAppearances\": 17, \"starterPercentage\": 100, \"minutes\": 1394, \"goals\": 3, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Lazio\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.99, \"fantaRatingAvg\": 5.92, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Lazio\", \"appearances\": 25, \"starterAppearances\": 18, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 5.97, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Lazio\", \"appearances\": 28, \"starterAppearances\": 21, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.07, \"fantaRatingAvg\": 6.07, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6866,9 +6898,9 @@ object PreloadedPlayersData {
             isCornerTaker = true,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Torino\", \"appearances\": 30, \"starterAppearances\": 23, \"starterPercentage\": 76, \"minutes\": 2117, \"goals\": 5, \"assists\": 4, \"expectedGoals\": 3.4, \"expectedAssists\": 2.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 2, \"penaltiesAttempted\": 2, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Torino\", \"appearances\": 37, \"starterAppearances\": 36, \"starterPercentage\": 97, \"minutes\": 3043, \"goals\": 8, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 5, \"penaltiesAttempted\": 5, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Torino\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.01, \"fantaRatingAvg\": 5.93, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Torino\", \"appearances\": 25, \"starterAppearances\": 19, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.04, \"fantaRatingAvg\": 5.98, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Torino\", \"appearances\": 28, \"starterAppearances\": 22, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.09, \"fantaRatingAvg\": 6.08, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 1, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6892,9 +6924,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "De Roon",
             ballottaggioShare = 70,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Atalanta\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.91, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Atalanta\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.01, \"fantaRatingAvg\": 5.96, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Atalanta\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 6.06, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6918,9 +6950,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Pasalic",
             ballottaggioShare = 55,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 31, \"starterAppearances\": 7, \"starterPercentage\": 22, \"minutes\": 1169, \"goals\": 2, \"assists\": 1, \"expectedGoals\": 2.0, \"expectedAssists\": 2.9, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 26, \"starterAppearances\": 11, \"starterPercentage\": 42, \"minutes\": 1030, \"goals\": 2, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Atalanta\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.89, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Atalanta\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 5.94, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Atalanta\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 6.04, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 1, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6944,9 +6976,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"es La Liga\", \"team\": \"Betis\", \"appearances\": 21, \"starterAppearances\": 15, \"starterPercentage\": 71, \"minutes\": 1111, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 2.3, \"expectedAssists\": 0.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 31, \"starterAppearances\": 18, \"starterPercentage\": 58, \"minutes\": 1731, \"goals\": 2, \"assists\": 9, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Como\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.89, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Como\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.99, \"fantaRatingAvg\": 5.94, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Como\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.04, \"fantaRatingAvg\": 6.04, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6970,9 +7002,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Juventus\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.91, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Juventus\", \"appearances\": 25, \"starterAppearances\": 18, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.01, \"fantaRatingAvg\": 5.96, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Juventus\", \"appearances\": 28, \"starterAppearances\": 21, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 6.06, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -6996,9 +7028,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Zhegrova",
             ballottaggioShare = 65,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 26, \"starterAppearances\": 12, \"starterPercentage\": 46, \"minutes\": 1340, \"goals\": 3, \"assists\": 3, \"expectedGoals\": 2.3, \"expectedAssists\": 4.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 31, \"starterAppearances\": 27, \"starterPercentage\": 87, \"minutes\": 2078, \"goals\": 3, \"assists\": 5, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Juventus\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 5.93, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Juventus\", \"appearances\": 25, \"starterAppearances\": 19, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.03, \"fantaRatingAvg\": 5.98, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Juventus\", \"appearances\": 28, \"starterAppearances\": 22, \"starterPercentage\": 78, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.08, \"fantaRatingAvg\": 6.08, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -7022,9 +7054,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"es La Liga\", \"team\": \"Real Madrid\", \"appearances\": 35, \"starterAppearances\": 17, \"starterPercentage\": 48, \"minutes\": 1827, \"goals\": 2, \"assists\": 6, \"expectedGoals\": 1.6, \"expectedAssists\": 7.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 34, \"starterAppearances\": 32, \"starterPercentage\": 94, \"minutes\": 2811, \"goals\": 2, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Milan\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.91, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Milan\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.01, \"fantaRatingAvg\": 5.96, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Milan\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 6.06, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -7048,9 +7080,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"es La Liga\", \"team\": \"Real Madrid\", \"appearances\": 23, \"starterAppearances\": 11, \"starterPercentage\": 47, \"minutes\": 1037, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Fiorentina\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.99, \"fantaRatingAvg\": 5.92, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Fiorentina\", \"appearances\": 25, \"starterAppearances\": 18, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.02, \"fantaRatingAvg\": 5.97, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Fiorentina\", \"appearances\": 28, \"starterAppearances\": 21, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.07, \"fantaRatingAvg\": 6.07, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -7074,9 +7106,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Milan\", \"appearances\": 23, \"starterAppearances\": 17, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.91, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Milan\", \"appearances\": 25, \"starterAppearances\": 18, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.01, \"fantaRatingAvg\": 5.96, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Milan\", \"appearances\": 28, \"starterAppearances\": 21, \"starterPercentage\": 75, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 6.06, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -7100,9 +7132,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"eng Premier League\", \"team\": \"Liverpool\", \"appearances\": 33, \"starterAppearances\": 19, \"starterPercentage\": 57, \"minutes\": 1712, \"goals\": 3, \"assists\": 3, \"expectedGoals\": 4.3, \"expectedAssists\": 1.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"eng Premier League\", \"team\": \"Liverpool\", \"appearances\": 34, \"starterAppearances\": 18, \"starterPercentage\": 52, \"minutes\": 1937, \"goals\": 1, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Inter\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.91, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Inter\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.01, \"fantaRatingAvg\": 5.96, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Inter\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 6.06, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -7126,9 +7158,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 28, \"starterAppearances\": 17, \"starterPercentage\": 60, \"minutes\": 1605, \"goals\": 3, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Bologna\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.9, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Bologna\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 5.95, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Bologna\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 6.05, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -7152,9 +7184,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 31, \"starterAppearances\": 5, \"starterPercentage\": 16, \"minutes\": 832, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 1.4, \"expectedAssists\": 1.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 8, \"starterAppearances\": 5, \"starterPercentage\": 62, \"minutes\": 399, \"goals\": 0, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Genoa\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.89, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Genoa\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.99, \"fantaRatingAvg\": 5.94, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Genoa\", \"appearances\": 18, \"starterAppearances\": 13, \"starterPercentage\": 72, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.04, \"fantaRatingAvg\": 6.04, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -7178,9 +7210,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "Mkhitaryan",
             ballottaggioShare = 65,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 26, \"starterAppearances\": 8, \"starterPercentage\": 30, \"minutes\": 980, \"goals\": 2, \"assists\": 2, \"expectedGoals\": 2.6, \"expectedAssists\": 0.9, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 2, \"penaltiesAttempted\": 2, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 34, \"starterAppearances\": 22, \"starterPercentage\": 64, \"minutes\": 2045, \"goals\": 6, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 1, \"penaltiesAttempted\": 1, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Inter\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.91, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Inter\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.01, \"fantaRatingAvg\": 5.96, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Inter\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 6.06, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -7204,9 +7236,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 35, \"starterAppearances\": 32, \"starterPercentage\": 91, \"minutes\": 2852, \"goals\": 6, \"assists\": 4, \"expectedGoals\": 4.4, \"expectedAssists\": 2.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 18, \"starterAppearances\": 14, \"starterPercentage\": 77, \"minutes\": 1258, \"goals\": 4, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Napoli\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.91, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Napoli\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.01, \"fantaRatingAvg\": 5.96, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Napoli\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 6.06, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -7230,9 +7262,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 34, \"starterAppearances\": 20, \"starterPercentage\": 58, \"minutes\": 1892, \"goals\": 3, \"assists\": 2, \"expectedGoals\": 2.8, \"expectedAssists\": 1.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 31, \"starterAppearances\": 27, \"starterPercentage\": 87, \"minutes\": 2186, \"goals\": 5, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Udinese\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.98, \"fantaRatingAvg\": 5.91, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Udinese\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.01, \"fantaRatingAvg\": 5.96, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Udinese\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.06, \"fantaRatingAvg\": 6.06, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -7256,9 +7288,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 26, \"starterAppearances\": 20, \"starterPercentage\": 76, \"minutes\": 1857, \"goals\": 0, \"assists\": 3, \"expectedGoals\": 0.9, \"expectedAssists\": 2.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 36, \"starterAppearances\": 33, \"starterPercentage\": 91, \"minutes\": 2742, \"goals\": 3, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 8, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Como\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.9, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Como\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 5.95, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Como\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 6.05, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -7282,9 +7314,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = "McKennie",
             ballottaggioShare = 40,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 35, \"starterAppearances\": 26, \"starterPercentage\": 74, \"minutes\": 2326, \"goals\": 4, \"assists\": 5, \"expectedGoals\": 3.5, \"expectedAssists\": 3.6, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 35, \"starterAppearances\": 30, \"starterPercentage\": 85, \"minutes\": 2442, \"goals\": 3, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Juventus\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.89, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Juventus\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.99, \"fantaRatingAvg\": 5.94, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Juventus\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.04, \"fantaRatingAvg\": 6.04, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -7308,9 +7340,9 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 1, \"starterAppearances\": 1, \"starterPercentage\": 100, \"minutes\": 90, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 35, \"starterAppearances\": 33, \"starterPercentage\": 94, \"minutes\": 2788, \"goals\": 3, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Milan\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.96, \"fantaRatingAvg\": 5.89, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Milan\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.99, \"fantaRatingAvg\": 5.94, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Milan\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.04, \"fantaRatingAvg\": 6.04, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -7334,9 +7366,9 @@ object PreloadedPlayersData {
             isCornerTaker = true,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 37, \"starterAppearances\": 34, \"starterPercentage\": 91, \"minutes\": 2804, \"goals\": 3, \"assists\": 4, \"expectedGoals\": 3.1, \"expectedAssists\": 4.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 34, \"starterAppearances\": 26, \"starterPercentage\": 76, \"minutes\": 2200, \"goals\": 2, \"assists\": 5, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
+            stats2023_24Json = "{\"season\": \"2023/24\", \"team\": \"Napoli\", \"appearances\": 16, \"starterAppearances\": 11, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 5.97, \"fantaRatingAvg\": 5.89, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2024_25Json = "{\"season\": \"2024/25\", \"team\": \"Napoli\", \"appearances\": 17, \"starterAppearances\": 12, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 5.94, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"cleanSheets\": 0}",
+            stats2025_26Json = "{\"season\": \"2025/26\", \"team\": \"Napoli\", \"appearances\": 19, \"starterAppearances\": 14, \"starterPercentage\": 73, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.5, \"expectedAssists\": 0.4, \"ratingAvg\": 6.05, \"fantaRatingAvg\": 6.04, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 1, \"cleanSheets\": 0}",
             status = "Disponibile",
             injuryNotes = "",
             expectedReturnDate = ""
@@ -7360,1966 +7392,40 @@ object PreloadedPlayersData {
             isCornerTaker = false,
             ballottaggioRival = null,
             ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 12, \"starterAppearances\": 8, \"starterPercentage\": 66, \"minutes\": 612, \"goals\": 1, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_kon__m",
-            name = "KonÃ© M.",
-            team = "Roma",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 10,
-            fvm = 42,
-            starterProb2026_27 = 85,
-            expectedFantasyPoints = 6.1,
-            expectedMinutes = 76,
-            riskLevel = RiskLevel.BASSO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 34, \"starterAppearances\": 31, \"starterPercentage\": 91, \"minutes\": 2572, \"goals\": 2, \"assists\": 1, \"expectedGoals\": 3.4, \"expectedAssists\": 1.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 29, \"starterAppearances\": 28, \"starterPercentage\": 96, \"minutes\": 2456, \"goals\": 2, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_thorstvedt",
-            name = "Thorstvedt",
-            team = "Sassuolo",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 10,
-            fvm = 40,
-            starterProb2026_27 = 85,
-            expectedFantasyPoints = 6.09,
-            expectedMinutes = 76,
-            riskLevel = RiskLevel.BASSO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Sassuolo\", \"appearances\": 32, \"starterAppearances\": 27, \"starterPercentage\": 84, \"minutes\": 2460, \"goals\": 4, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 9, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_casadei",
-            name = "Casadei",
-            team = "Torino",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 10,
-            fvm = 32,
-            starterProb2026_27 = 85,
-            expectedFantasyPoints = 6.04,
-            expectedMinutes = 76,
-            riskLevel = RiskLevel.BASSO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Torino\", \"appearances\": 15, \"starterAppearances\": 13, \"starterPercentage\": 86, \"minutes\": 1017, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 1.2, \"expectedAssists\": 0.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Torino\", \"appearances\": 33, \"starterAppearances\": 19, \"starterPercentage\": 57, \"minutes\": 1997, \"goals\": 6, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_pellegrini_lo",
-            name = "Pellegrini Lo.",
-            team = "Roma",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 10,
-            fvm = 25,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 6.15,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = true,
-            penaltyOrder = 2,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = "Mora",
-            ballottaggioShare = 40,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 25, \"starterAppearances\": 20, \"starterPercentage\": 80, \"minutes\": 1626, \"goals\": 2, \"assists\": 1, \"expectedGoals\": 4.7, \"expectedAssists\": 2.5, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 1, \"penaltiesAttempted\": 1, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 24, \"starterAppearances\": 20, \"starterPercentage\": 83, \"minutes\": 1463, \"goals\": 4, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 2, \"penaltiesAttempted\": 2, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_pasalic",
-            name = "Pasalic",
-            team = "Atalanta",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 9,
-            fvm = 24,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.91,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = "Samardzic",
-            ballottaggioShare = 45,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 34, \"starterAppearances\": 23, \"starterPercentage\": 67, \"minutes\": 1967, \"goals\": 3, \"assists\": 4, \"expectedGoals\": 6.6, \"expectedAssists\": 3.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 1, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 33, \"starterAppearances\": 21, \"starterPercentage\": 63, \"minutes\": 1936, \"goals\": 3, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_bernardeschi",
-            name = "Bernardeschi",
-            team = "Bologna",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 9,
-            fvm = 30,
-            starterProb2026_27 = 85,
-            expectedFantasyPoints = 6.03,
-            expectedMinutes = 76,
-            riskLevel = RiskLevel.BASSO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 29, \"starterAppearances\": 12, \"starterPercentage\": 41, \"minutes\": 1217, \"goals\": 4, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 1, \"penaltiesAttempted\": 1, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_mandragora",
-            name = "Mandragora",
-            team = "Fiorentina",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 9,
-            fvm = 23,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.9,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 28, \"starterAppearances\": 22, \"starterPercentage\": 78, \"minutes\": 1856, \"goals\": 4, \"assists\": 2, \"expectedGoals\": 2.7, \"expectedAssists\": 4.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 1, \"penaltiesAttempted\": 1, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 34, \"starterAppearances\": 30, \"starterPercentage\": 88, \"minutes\": 2421, \"goals\": 7, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 1, \"penaltiesAttempted\": 1, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_diouf",
-            name = "Diouf",
-            team = "Inter",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 9,
-            fvm = 44,
-            starterProb2026_27 = 85,
-            expectedFantasyPoints = 6.11,
-            expectedMinutes = 76,
-            riskLevel = RiskLevel.BASSO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"fr Ligue 1\", \"team\": \"Lens\", \"appearances\": 34, \"starterAppearances\": 27, \"starterPercentage\": 79, \"minutes\": 2225, \"goals\": 1, \"assists\": 2, \"expectedGoals\": 2.9, \"expectedAssists\": 2.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 19, \"starterAppearances\": 4, \"starterPercentage\": 21, \"minutes\": 493, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_frattesi",
-            name = "Frattesi",
-            team = "Lazio",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 9,
-            fvm = 68,
-            starterProb2026_27 = 85,
-            expectedFantasyPoints = 6.24,
-            expectedMinutes = 76,
-            riskLevel = RiskLevel.BASSO,
-            confidenceLevel = ConfidenceLevel.ALTA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = "Barella",
-            ballottaggioShare = 40,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 27, \"starterAppearances\": 9, \"starterPercentage\": 33, \"minutes\": 1158, \"goals\": 5, \"assists\": 1, \"expectedGoals\": 4.0, \"expectedAssists\": 0.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 22, \"starterAppearances\": 3, \"starterPercentage\": 13, \"minutes\": 569, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_cancellieri",
-            name = "Cancellieri",
-            team = "Lazio",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 9,
-            fvm = 28,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.93,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Parma\", \"appearances\": 27, \"starterAppearances\": 19, \"starterPercentage\": 70, \"minutes\": 1424, \"goals\": 3, \"assists\": 0, \"expectedGoals\": 2.7, \"expectedAssists\": 0.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 30, \"starterAppearances\": 21, \"starterPercentage\": 70, \"minutes\": 1725, \"goals\": 4, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_isaksen",
-            name = "Isaksen",
-            team = "Lazio",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 9,
-            fvm = 22,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.9,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 37, \"starterAppearances\": 29, \"starterPercentage\": 78, \"minutes\": 2210, \"goals\": 4, \"assists\": 2, \"expectedGoals\": 5.2, \"expectedAssists\": 2.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 30, \"starterAppearances\": 18, \"starterPercentage\": 60, \"minutes\": 1593, \"goals\": 5, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_kon__i",
-            name = "KonÃ© I.",
-            team = "Sassuolo",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 9,
-            fvm = 20,
-            starterProb2026_27 = 45,
-            expectedFantasyPoints = 5.61,
-            expectedMinutes = 40,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 13, \"starterAppearances\": 5, \"starterPercentage\": 38, \"minutes\": 540, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 1.8, \"expectedAssists\": 0.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Sassuolo\", \"appearances\": 35, \"starterAppearances\": 33, \"starterPercentage\": 94, \"minutes\": 2737, \"goals\": 6, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Infortunato",
-            injuryNotes = "Frattura di tibia e perone",
-            expectedReturnDate = "Rientro gennaio 2027"
-        ),
-        PlayerEntity(
-            id = "c_gaetano",
-            name = "Gaetano",
-            team = "Atalanta",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 8,
-            fvm = 30,
-            starterProb2026_27 = 85,
-            expectedFantasyPoints = 6.03,
-            expectedMinutes = 76,
-            riskLevel = RiskLevel.BASSO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_odgaard",
-            name = "Odgaard",
-            team = "Bologna",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 8,
-            fvm = 17,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.87,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 29, \"starterAppearances\": 24, \"starterPercentage\": 82, \"minutes\": 1952, \"goals\": 6, \"assists\": 1, \"expectedGoals\": 3.6, \"expectedAssists\": 1.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 26, \"starterAppearances\": 16, \"starterPercentage\": 61, \"minutes\": 1378, \"goals\": 5, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_cambiaghi",
-            name = "Cambiaghi",
-            team = "Bologna",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 8,
-            fvm = 21,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.89,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = true,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 18, \"starterAppearances\": 4, \"starterPercentage\": 22, \"minutes\": 620, \"goals\": 1, \"assists\": 3, \"expectedGoals\": 0.8, \"expectedAssists\": 1.9, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 28, \"starterAppearances\": 17, \"starterPercentage\": 60, \"minutes\": 1518, \"goals\": 3, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_fagioli",
-            name = "Fagioli",
-            team = "Fiorentina",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 8,
-            fvm = 22,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.9,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 66, \"minutes\": 962, \"goals\": 1, \"assists\": 2, \"expectedGoals\": 0.5, \"expectedAssists\": 3.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 33, \"starterAppearances\": 30, \"starterPercentage\": 90, \"minutes\": 2554, \"goals\": 2, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_ndour",
-            name = "Ndour",
-            team = "Fiorentina",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 8,
-            fvm = 25,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.91,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 9, \"starterAppearances\": 4, \"starterPercentage\": 44, \"minutes\": 406, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.1, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 33, \"starterAppearances\": 20, \"starterPercentage\": 60, \"minutes\": 1876, \"goals\": 3, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_sucic_p",
-            name = "Sucic P.",
-            team = "Inter",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 8,
-            fvm = 21,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.89,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 34, \"starterAppearances\": 21, \"starterPercentage\": 61, \"minutes\": 1765, \"goals\": 2, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_locatelli",
-            name = "Locatelli",
-            team = "Juventus",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 8,
-            fvm = 33,
-            starterProb2026_27 = 85,
-            expectedFantasyPoints = 6.05,
-            expectedMinutes = 76,
-            riskLevel = RiskLevel.BASSO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 36, \"starterAppearances\": 34, \"starterPercentage\": 94, \"minutes\": 2822, \"goals\": 2, \"assists\": 2, \"expectedGoals\": 1.8, \"expectedAssists\": 2.5, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 9, \"redCards\": 0, \"penaltiesScored\": 1, \"penaltiesAttempted\": 1, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 36, \"starterAppearances\": 36, \"starterPercentage\": 100, \"minutes\": 2994, \"goals\": 1, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 9, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 1, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_colpani",
-            name = "Colpani",
-            team = "Monza",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 8,
-            fvm = 25,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.91,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 24, \"starterAppearances\": 17, \"starterPercentage\": 70, \"minutes\": 1432, \"goals\": 2, \"assists\": 1, \"expectedGoals\": 2.7, \"expectedAssists\": 1.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_lobotka",
-            name = "Lobotka",
-            team = "Napoli",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 8,
-            fvm = 22,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.9,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 32, \"starterAppearances\": 31, \"starterPercentage\": 96, \"minutes\": 2636, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.3, \"expectedAssists\": 1.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 32, \"starterAppearances\": 29, \"starterPercentage\": 90, \"minutes\": 2431, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_cristante",
-            name = "Cristante",
-            team = "Roma",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 8,
-            fvm = 29,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.93,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 30, \"starterAppearances\": 23, \"starterPercentage\": 76, \"minutes\": 2045, \"goals\": 4, \"assists\": 2, \"expectedGoals\": 2.1, \"expectedAssists\": 1.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 8, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 37, \"starterAppearances\": 36, \"starterPercentage\": 97, \"minutes\": 3094, \"goals\": 2, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_volpato",
-            name = "Volpato",
-            team = "Sassuolo",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 8,
-            fvm = 23,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.9,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Sassuolo\", \"appearances\": 24, \"starterAppearances\": 11, \"starterPercentage\": 45, \"minutes\": 1064, \"goals\": 2, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_schmid",
-            name = "Schmid",
-            team = "Frosinone",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 8,
-            fvm = 28,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.93,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"de Bundesliga\", \"team\": \"Werder Bremen\", \"appearances\": 32, \"starterAppearances\": 32, \"starterPercentage\": 100, \"minutes\": 2834, \"goals\": 5, \"assists\": 4, \"expectedGoals\": 4.3, \"expectedAssists\": 6.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 1, \"penaltiesAttempted\": 1, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"de Bundesliga\", \"team\": \"Werder Bremen\", \"appearances\": 34, \"starterAppearances\": 34, \"starterPercentage\": 100, \"minutes\": 2982, \"goals\": 4, \"assists\": 8, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 3, \"penaltiesAttempted\": 4, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_ferguson",
-            name = "Ferguson",
-            team = "Bologna",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 7,
-            fvm = 23,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.9,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 16, \"starterAppearances\": 10, \"starterPercentage\": 62, \"minutes\": 983, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 1.0, \"expectedAssists\": 1.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 1, \"penaltiesAttempted\": 1, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 27, \"starterAppearances\": 17, \"starterPercentage\": 62, \"minutes\": 1601, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_adopo",
-            name = "Adopo",
-            team = "Cagliari",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 7,
-            fvm = 13,
-            starterProb2026_27 = 60,
-            expectedFantasyPoints = 5.71,
-            expectedMinutes = 54,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.BASSA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Cagliari\", \"appearances\": 35, \"starterAppearances\": 27, \"starterPercentage\": 77, \"minutes\": 2409, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 1.1, \"expectedAssists\": 2.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Cagliari\", \"appearances\": 38, \"starterAppearances\": 33, \"starterPercentage\": 86, \"minutes\": 3050, \"goals\": 1, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_romano",
-            name = "Romano",
-            team = "Cagliari",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 7,
-            fvm = 20,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.88,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"de Bundesliga\", \"team\": \"Werder Bremen\", \"appearances\": 32, \"starterAppearances\": 32, \"starterPercentage\": 100, \"minutes\": 2834, \"goals\": 5, \"assists\": 4, \"expectedGoals\": 4.3, \"expectedAssists\": 6.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 1, \"penaltiesAttempted\": 1, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_fazzini",
-            name = "Fazzini",
-            team = "Cagliari",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 7,
-            fvm = 24,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.91,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Empoli\", \"appearances\": 20, \"starterAppearances\": 16, \"starterPercentage\": 80, \"minutes\": 1383, \"goals\": 4, \"assists\": 1, \"expectedGoals\": 3.1, \"expectedAssists\": 0.5, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Fiorentina\", \"appearances\": 20, \"starterAppearances\": 5, \"starterPercentage\": 25, \"minutes\": 584, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_cal",
-            name = "CalÃ²",
-            team = "Frosinone",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 7,
-            fvm = 25,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 6.59,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = true,
-            penaltyOrder = 1,
-            isFreeKickTaker = true,
-            isCornerTaker = true,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_frendrup",
-            name = "Frendrup",
-            team = "Genoa",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 7,
-            fvm = 20,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.88,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 35, \"starterAppearances\": 35, \"starterPercentage\": 100, \"minutes\": 3103, \"goals\": 2, \"assists\": 0, \"expectedGoals\": 1.6, \"expectedAssists\": 0.9, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 36, \"starterAppearances\": 35, \"starterPercentage\": 97, \"minutes\": 3081, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_rovella",
-            name = "Rovella",
-            team = "Lazio",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 7,
-            fvm = 16,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.86,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 33, \"starterAppearances\": 31, \"starterPercentage\": 93, \"minutes\": 2718, \"goals\": 0, \"assists\": 3, \"expectedGoals\": 1.5, \"expectedAssists\": 2.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 13, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 11, \"starterAppearances\": 6, \"starterPercentage\": 54, \"minutes\": 512, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_coulibaly_l",
-            name = "Coulibaly L.",
-            team = "Lecce",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 7,
-            fvm = 17,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.87,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 38, \"starterAppearances\": 30, \"starterPercentage\": 78, \"minutes\": 2667, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.8, \"expectedAssists\": 0.9, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 33, \"starterAppearances\": 31, \"starterPercentage\": 93, \"minutes\": 2689, \"goals\": 3, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_chukwueze",
-            name = "Chukwueze",
-            team = "Milan",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 7,
-            fvm = 22,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.9,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 26, \"starterAppearances\": 9, \"starterPercentage\": 34, \"minutes\": 925, \"goals\": 3, \"assists\": 2, \"expectedGoals\": 2.7, \"expectedAssists\": 3.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 1, \"starterAppearances\": 0, \"starterPercentage\": 0, \"minutes\": 26, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_pessina",
-            name = "Pessina",
-            team = "Monza",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 7,
-            fvm = 15,
-            starterProb2026_27 = 45,
-            expectedFantasyPoints = 6.04,
-            expectedMinutes = 40,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = true,
-            penaltyOrder = 1,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Monza\", \"appearances\": 11, \"starterAppearances\": 10, \"starterPercentage\": 90, \"minutes\": 854, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.2, \"expectedAssists\": 0.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "",
-            status = "Infortunato",
-            injuryNotes = "Lesione alla rotula",
-            expectedReturnDate = "Rientro fine ottobre-inizio novembre"
-        ),
-        PlayerEntity(
-            id = "c_bernab",
-            name = "BernabÃ©",
-            team = "Parma",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 7,
-            fvm = 35,
-            starterProb2026_27 = 85,
-            expectedFantasyPoints = 6.5,
-            expectedMinutes = 76,
-            riskLevel = RiskLevel.BASSO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = true,
-            penaltyOrder = 2,
-            isFreeKickTaker = true,
-            isCornerTaker = true,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Parma\", \"appearances\": 21, \"starterAppearances\": 18, \"starterPercentage\": 85, \"minutes\": 1453, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 1.3, \"expectedAssists\": 1.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Parma\", \"appearances\": 32, \"starterAppearances\": 31, \"starterPercentage\": 96, \"minutes\": 2470, \"goals\": 3, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_pisilli",
-            name = "Pisilli",
-            team = "Roma",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 7,
-            fvm = 17,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.87,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 28, \"starterAppearances\": 11, \"starterPercentage\": 39, \"minutes\": 1227, \"goals\": 2, \"assists\": 1, \"expectedGoals\": 2.7, \"expectedAssists\": 0.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Roma\", \"appearances\": 25, \"starterAppearances\": 13, \"starterPercentage\": 52, \"minutes\": 1295, \"goals\": 2, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_oristanio",
-            name = "Oristanio",
-            team = "Torino",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 7,
-            fvm = 12,
-            starterProb2026_27 = 60,
-            expectedFantasyPoints = 5.7,
-            expectedMinutes = 54,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.BASSA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Venezia\", \"appearances\": 37, \"starterAppearances\": 29, \"starterPercentage\": 78, \"minutes\": 2315, \"goals\": 3, \"assists\": 3, \"expectedGoals\": 4.1, \"expectedAssists\": 2.6, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Parma\", \"appearances\": 20, \"starterAppearances\": 8, \"starterPercentage\": 40, \"minutes\": 859, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_karlstrom",
-            name = "Karlstrom",
-            team = "Udinese",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 7,
-            fvm = 20,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.88,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 37, \"starterAppearances\": 36, \"starterPercentage\": 97, \"minutes\": 3186, \"goals\": 0, \"assists\": 3, \"expectedGoals\": 0.7, \"expectedAssists\": 1.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 9, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Udinese\", \"appearances\": 36, \"starterAppearances\": 36, \"starterPercentage\": 100, \"minutes\": 3146, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_unai_gomez",
-            name = "Unai Gomez",
-            team = "Udinese",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 7,
-            fvm = 17,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.87,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"es La Liga\", \"team\": \"Athletic Club\", \"appearances\": 32, \"starterAppearances\": 14, \"starterPercentage\": 43, \"minutes\": 1284, \"goals\": 1, \"assists\": 3, \"expectedGoals\": 1.9, \"expectedAssists\": 0.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"es La Liga\", \"team\": \"Athletic Club\", \"appearances\": 26, \"starterAppearances\": 12, \"starterPercentage\": 46, \"minutes\": 936, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_sow",
-            name = "Sow",
-            team = "Genoa",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 7,
-            fvm = 15,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.86,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"es La Liga\", \"team\": \"Sevilla\", \"appearances\": 33, \"starterAppearances\": 27, \"starterPercentage\": 81, \"minutes\": 2187, \"goals\": 5, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_elmas",
-            name = "Elmas",
-            team = "Atalanta",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 7,
-            fvm = 28,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.93,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Napoli\", \"appearances\": 33, \"starterAppearances\": 20, \"starterPercentage\": 60, \"minutes\": 1783, \"goals\": 1, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_zalewski",
-            name = "Zalewski",
-            team = "Atalanta",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 6,
-            fvm = 20,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.88,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Atalanta\", \"appearances\": 33, \"starterAppearances\": 24, \"starterPercentage\": 72, \"minutes\": 1897, \"goals\": 2, \"assists\": 4, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_pobega",
-            name = "Pobega",
-            team = "Bologna",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 6,
-            fvm = 13,
-            starterProb2026_27 = 60,
-            expectedFantasyPoints = 5.71,
-            expectedMinutes = 54,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.BASSA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 21, \"starterAppearances\": 13, \"starterPercentage\": 61, \"minutes\": 1178, \"goals\": 2, \"assists\": 2, \"expectedGoals\": 2.1, \"expectedAssists\": 1.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 2, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Bologna\", \"appearances\": 26, \"starterAppearances\": 17, \"starterPercentage\": 65, \"minutes\": 1434, \"goals\": 3, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_winks",
-            name = "Winks",
-            team = "Cagliari",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 6,
-            fvm = 15,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.86,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"eng Premier League\", \"team\": \"Leicester City\", \"appearances\": 22, \"starterAppearances\": 17, \"starterPercentage\": 77, \"minutes\": 1538, \"goals\": 0, \"assists\": 2, \"expectedGoals\": 0.2, \"expectedAssists\": 1.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_milla",
-            name = "Milla",
-            team = "Como",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 6,
-            fvm = 20,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.88,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_caqueret",
-            name = "Caqueret",
-            team = "Como",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 6,
-            fvm = 17,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.87,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 18, \"starterAppearances\": 15, \"starterPercentage\": 83, \"minutes\": 1087, \"goals\": 2, \"assists\": 3, \"expectedGoals\": 0.8, \"expectedAssists\": 1.5, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 30, \"starterAppearances\": 17, \"starterPercentage\": 56, \"minutes\": 1485, \"goals\": 2, \"assists\": 6, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_liberali",
-            name = "Liberali",
-            team = "Como",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 6,
-            fvm = 21,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.89,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 1, \"starterAppearances\": 1, \"starterPercentage\": 100, \"minutes\": 61, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.1, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_oulai",
-            name = "Oulai",
-            team = "Fiorentina",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 6,
-            fvm = 20,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.88,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_ellertsson",
-            name = "Ellertsson",
-            team = "Genoa",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 6,
-            fvm = 18,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.87,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Venezia\", \"appearances\": 36, \"starterAppearances\": 29, \"starterPercentage\": 80, \"minutes\": 2470, \"goals\": 2, \"assists\": 2, \"expectedGoals\": 1.1, \"expectedAssists\": 1.6, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 36, \"starterAppearances\": 31, \"starterPercentage\": 86, \"minutes\": 2767, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_zhegrova",
-            name = "Zhegrova",
-            team = "Juventus",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 6,
-            fvm = 20,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.88,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = "Conceicao",
-            ballottaggioShare = 35,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"fr Ligue 1\", \"team\": \"Lille\", \"appearances\": 12, \"starterAppearances\": 12, \"starterPercentage\": 100, \"minutes\": 978, \"goals\": 4, \"assists\": 1, \"expectedGoals\": 2.3, \"expectedAssists\": 2.2, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 19, \"starterAppearances\": 0, \"starterPercentage\": 0, \"minutes\": 382, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_pierotti",
-            name = "Pierotti",
-            team = "Lecce",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 6,
-            fvm = 19,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.88,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 36, \"starterAppearances\": 22, \"starterPercentage\": 61, \"minutes\": 1937, \"goals\": 4, \"assists\": 2, \"expectedGoals\": 3.1, \"expectedAssists\": 2.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 37, \"starterAppearances\": 31, \"starterPercentage\": 83, \"minutes\": 2597, \"goals\": 1, \"assists\": 2, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_akinsanmiro",
-            name = "Akinsanmiro",
-            team = "Monza",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 6,
-            fvm = 16,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.86,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Pisa\", \"appearances\": 24, \"starterAppearances\": 16, \"starterPercentage\": 66, \"minutes\": 1444, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 2, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_nicolussi_caviglia",
-            name = "Nicolussi Caviglia",
-            team = "Parma",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 6,
-            fvm = 16,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.86,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Venezia\", \"appearances\": 35, \"starterAppearances\": 33, \"starterPercentage\": 94, \"minutes\": 2861, \"goals\": 4, \"assists\": 2, \"expectedGoals\": 2.4, \"expectedAssists\": 2.1, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Parma\", \"appearances\": 15, \"starterAppearances\": 10, \"starterPercentage\": 66, \"minutes\": 869, \"goals\": 0, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Infortunato",
-            injuryNotes = "Lesione di medio grado alla coscia",
-            expectedReturnDate = "Rientro metÃ  settembre"
-        ),
-        PlayerEntity(
-            id = "c_matic",
-            name = "Matic",
-            team = "Sassuolo",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 6,
-            fvm = 15,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.86,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"fr Ligue 1\", \"team\": \"Lyon\", \"appearances\": 29, \"starterAppearances\": 25, \"starterPercentage\": 86, \"minutes\": 2010, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.1, \"expectedAssists\": 1.3, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Sassuolo\", \"appearances\": 34, \"starterAppearances\": 31, \"starterPercentage\": 91, \"minutes\": 2660, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 7, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_gineitis",
-            name = "Gineitis",
-            team = "Torino",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 6,
-            fvm = 12,
-            starterProb2026_27 = 60,
-            expectedFantasyPoints = 5.7,
-            expectedMinutes = 54,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.BASSA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Torino\", \"appearances\": 30, \"starterAppearances\": 15, \"starterPercentage\": 50, \"minutes\": 1430, \"goals\": 3, \"assists\": 1, \"expectedGoals\": 1.3, \"expectedAssists\": 2.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Torino\", \"appearances\": 29, \"starterAppearances\": 23, \"starterPercentage\": 79, \"minutes\": 1756, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_basic",
-            name = "Basic",
-            team = "Venezia",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 6,
-            fvm = 19,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.88,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 23, \"starterAppearances\": 23, \"starterPercentage\": 100, \"minutes\": 1735, \"goals\": 2, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_tour__i",
-            name = "TourÃ© I.",
-            team = "Monza",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 6,
-            fvm = 15,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.86,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Pisa\", \"appearances\": 32, \"starterAppearances\": 26, \"starterPercentage\": 81, \"minutes\": 2279, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_amondarain",
-            name = "Amondarain",
-            team = "Bologna",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 5,
-            fvm = 12,
-            starterProb2026_27 = 60,
-            expectedFantasyPoints = 5.7,
-            expectedMinutes = 54,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.BASSA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_felici",
-            name = "Felici",
-            team = "Cagliari",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 5,
-            fvm = 8,
-            starterProb2026_27 = 60,
-            expectedFantasyPoints = 5.68,
-            expectedMinutes = 54,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.BASSA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Cagliari\", \"appearances\": 20, \"starterAppearances\": 9, \"starterPercentage\": 45, \"minutes\": 925, \"goals\": 0, \"assists\": 3, \"expectedGoals\": 0.6, \"expectedAssists\": 1.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Cagliari\", \"appearances\": 12, \"starterAppearances\": 4, \"starterPercentage\": 33, \"minutes\": 412, \"goals\": 2, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_addai",
-            name = "Addai",
-            team = "Como",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 5,
-            fvm = 10,
-            starterProb2026_27 = 45,
-            expectedFantasyPoints = 5.56,
-            expectedMinutes = 40,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.BASSA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Como\", \"appearances\": 12, \"starterAppearances\": 7, \"starterPercentage\": 58, \"minutes\": 686, \"goals\": 3, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Infortunato",
-            injuryNotes = "Rottura del tendine d'Achille",
-            expectedReturnDate = "Rientro settembre/ottobre"
-        ),
-        PlayerEntity(
-            id = "c_zerbin",
-            name = "Zerbin",
-            team = "Frosinone",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 5,
-            fvm = 12,
-            starterProb2026_27 = 60,
-            expectedFantasyPoints = 5.7,
-            expectedMinutes = 54,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.BASSA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Cremonese\", \"appearances\": 32, \"starterAppearances\": 17, \"starterPercentage\": 53, \"minutes\": 1646, \"goals\": 0, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_amorim",
-            name = "Amorim",
-            team = "Genoa",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 5,
-            fvm = 11,
-            starterProb2026_27 = 60,
-            expectedFantasyPoints = 5.7,
-            expectedMinutes = 54,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.BASSA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Genoa\", \"appearances\": 11, \"starterAppearances\": 6, \"starterPercentage\": 54, \"minutes\": 552, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_meichtry",
-            name = "Meichtry",
-            team = "Genoa",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 5,
-            fvm = 11,
-            starterProb2026_27 = 60,
-            expectedFantasyPoints = 5.7,
-            expectedMinutes = 54,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.BASSA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_traor__hj",
-            name = "TraorÃ© Hj.",
-            team = "Genoa",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 5,
-            fvm = 11,
-            starterProb2026_27 = 60,
-            expectedFantasyPoints = 5.7,
-            expectedMinutes = 54,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.BASSA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_mkhitaryan",
-            name = "Mkhitaryan",
-            team = "Inter",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 5,
-            fvm = 10,
-            starterProb2026_27 = 60,
-            expectedFantasyPoints = 5.69,
-            expectedMinutes = 54,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.BASSA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = "Zielinski",
-            ballottaggioShare = 35,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 31, \"starterAppearances\": 29, \"starterPercentage\": 93, \"minutes\": 2328, \"goals\": 1, \"assists\": 4, \"expectedGoals\": 1.5, \"expectedAssists\": 2.7, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Inter\", \"appearances\": 30, \"starterAppearances\": 16, \"starterPercentage\": 53, \"minutes\": 1560, \"goals\": 4, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_koopmeiners",
-            name = "Koopmeiners",
-            team = "Juventus",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 5,
-            fvm = 13,
-            starterProb2026_27 = 60,
-            expectedFantasyPoints = 5.71,
-            expectedMinutes = 54,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.BASSA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 28, \"starterAppearances\": 23, \"starterPercentage\": 82, \"minutes\": 1994, \"goals\": 3, \"assists\": 3, \"expectedGoals\": 3.9, \"expectedAssists\": 2.9, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 3, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 33, \"starterAppearances\": 18, \"starterPercentage\": 54, \"minutes\": 1827, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_dele_bashiru",
-            name = "Dele-Bashiru",
-            team = "Lazio",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 5,
-            fvm = 13,
-            starterProb2026_27 = 60,
-            expectedFantasyPoints = 5.71,
-            expectedMinutes = 54,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.BASSA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 20, \"starterAppearances\": 12, \"starterPercentage\": 60, \"minutes\": 947, \"goals\": 3, \"assists\": 1, \"expectedGoals\": 1.1, \"expectedAssists\": 0.8, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lazio\", \"appearances\": 24, \"starterAppearances\": 11, \"starterPercentage\": 45, \"minutes\": 1187, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Infortunato",
-            injuryNotes = "Problema fisico",
-            expectedReturnDate = "Da valutare"
-        ),
-        PlayerEntity(
-            id = "c_berisha_m",
-            name = "Berisha M.",
-            team = "Lecce",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 5,
-            fvm = 12,
-            starterProb2026_27 = 60,
-            expectedFantasyPoints = 5.7,
-            expectedMinutes = 54,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.BASSA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 17, \"starterAppearances\": 7, \"starterPercentage\": 41, \"minutes\": 716, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.7, \"expectedAssists\": 0.6, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 13, \"starterAppearances\": 12, \"starterPercentage\": 92, \"minutes\": 871, \"goals\": 2, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_gandelman",
-            name = "Gandelman",
-            team = "Lecce",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 5,
-            fvm = 10,
-            starterProb2026_27 = 60,
-            expectedFantasyPoints = 5.69,
-            expectedMinutes = 54,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.BASSA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Lecce\", \"appearances\": 19, \"starterAppearances\": 10, \"starterPercentage\": 52, \"minutes\": 975, \"goals\": 2, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_fofana_y",
-            name = "Fofana Y.",
-            team = "Milan",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 5,
-            fvm = 10,
-            starterProb2026_27 = 60,
-            expectedFantasyPoints = 5.69,
-            expectedMinutes = 54,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.BASSA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 35, \"starterAppearances\": 29, \"starterPercentage\": 82, \"minutes\": 2504, \"goals\": 1, \"assists\": 6, \"expectedGoals\": 1.3, \"expectedAssists\": 3.4, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 5, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 33, \"starterAppearances\": 28, \"starterPercentage\": 84, \"minutes\": 2203, \"goals\": 2, \"assists\": 3, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 4, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_jashari",
-            name = "Jashari",
-            team = "Milan",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 5,
-            fvm = 13,
-            starterProb2026_27 = 60,
-            expectedFantasyPoints = 5.71,
-            expectedMinutes = 54,
-            riskLevel = RiskLevel.ALTO,
-            confidenceLevel = ConfidenceLevel.BASSA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Milan\", \"appearances\": 14, \"starterAppearances\": 7, \"starterPercentage\": 50, \"minutes\": 701, \"goals\": 0, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_keita_m",
-            name = "Keita M.",
-            team = "Parma",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 5,
-            fvm = 15,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.86,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Parma\", \"appearances\": 30, \"starterAppearances\": 24, \"starterPercentage\": 80, \"minutes\": 1826, \"goals\": 0, \"assists\": 2, \"expectedGoals\": 0.1, \"expectedAssists\": 1.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 6, \"redCards\": 1, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Parma\", \"appearances\": 37, \"starterAppearances\": 36, \"starterPercentage\": 97, \"minutes\": 2979, \"goals\": 1, \"assists\": 1, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 1, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_adzic",
-            name = "Adzic",
-            team = "Sassuolo",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 5,
-            fvm = 16,
-            starterProb2026_27 = 75,
-            expectedFantasyPoints = 5.86,
-            expectedMinutes = 67,
-            riskLevel = RiskLevel.MEDIO,
-            confidenceLevel = ConfidenceLevel.MEDIA,
-            isPenaltyTaker = false,
-            penaltyOrder = 0,
-            isFreeKickTaker = false,
-            isCornerTaker = false,
-            ballottaggioRival = null,
-            ballottaggioShare = 100,
-            stats2023_24Json = "",
-            stats2024_25Json = "{\"season\": \"2024/25\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 6, \"starterAppearances\": 0, \"starterPercentage\": 0, \"minutes\": 42, \"goals\": 0, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            stats2025_26Json = "{\"season\": \"2025/26\", \"competition\": \"it Serie A\", \"team\": \"Juventus\", \"appearances\": 10, \"starterAppearances\": 1, \"starterPercentage\": 10, \"minutes\": 171, \"goals\": 1, \"assists\": 0, \"expectedGoals\": 0.0, \"expectedAssists\": 0.0, \"ratingAvg\": 6.0, \"fantaRatingAvg\": 6.0, \"yellowCards\": 0, \"redCards\": 0, \"penaltiesScored\": 0, \"penaltiesAttempted\": 0, \"cleanSheets\": 0, \"saves\": 0, \"goalsAgainst\": 0}",
-            status = "Disponibile",
-            injuryNotes = "",
-            expectedReturnDate = ""
-        ),
-        PlayerEntity(
-            id = "c_bakola",
-            name = "Bakola",
-            team = "Sassuolo",
-            role = Role.C,
-            mantraRole = "",
-            quotation = 5,
-            fvm = 14,
-            starterProb2026_27 = 60,
-            expectedFantasyPoints = 5.72,
-    xœì]Ûn#·–}Ÿ¯(øi8QÄºJÌƒÛnw:íîv`Z¢eÆ¥¢SŸcæ_æu¾ãüØ°$—ÝÅâ¦JR](‰ýt›´l‰ÅµöumËZý!ÿx$Ó”Ì¾Ò(KIbý‡å¹ûë»?1M.É	ùÚuñ÷Áéå¯¿”÷MYtGg$š’b÷Yù+ƒ§77§åo¢É‰p˜>ÿŠHÌ¿ç‡	)ïy\íø%ž-wÅW¸ˆ	ùB§Š— É‹#+¶Üâ0diŠçsÊ®éÎß@”…!¼ëæÇ„ïBCáWJRœ&öÐv&¶ûsÂ"¾çäD¾ÅØ^±å¿ÿ8Iæÿøãäß­?NòÕmï“¿ñLÙâ‘¤4¥Åê]l]ÒyF,´Ú¼X­|ÅqBh’Õ~|$8Æü’|ÝÎ¿Æzœ’ø´¼4ünéŠÄSñ÷IÞV«'$ÿ7ró/Ìÿß–q’Ð$}ÿwñ`}zÛ5(}ýô»ý«•§4šŸ>Íó¯ù«¯ÝaþK\Kž	?ˆ¿Ÿáx¶ú–/@fo_XnZ=9”$7SÆ«_?MS²xL¿[š†G7÷„|÷VüôÝ'´|Û§sL£$]~ñ€³õ&¶Ÿ­÷£ígKSë†Ä”X§âÙÞðO9c!“­-ùâÙÚ#åá¢îw¨Ùáf9LžœÓä‘Eô–†DØC£?³øù[á©xõ‹Ïèš¤Yã”,7½íù·÷íW!~&ñÇˆ?ÏÿZþ³ü›¦“)žN)^àˆ
-?%Â‹åëžAò‡*ßð+‹iÄ„Å˜…ùw_óÿÎÊKü¥Ò_¯6ˆïí¯ŒñÏ‡.Ÿy¯¼t÷”ÿ8»
-•Ëg2f·üNø;à›Oþ‰]äÏKò|Åh”.™j0Éw¾³™Ôa³¯Ï?oLgù7:+mÙšÎ`È[=Ÿíq™ƒtã2ÝàNä2½1ú“Š?½ÀÂoÕ¥~P¹5PÐÖEÁÀ^‡‚Æ¦ï	»38‰<(m(‘# ¥=— õoÚšA¥F8øHY³¿'exm(0ñ·H"¾…ö@Ñ«Š˜†¾1*¾>ÃRXt,Â¤_‰†øcß ãÞ ãm–PÑÒ+0ñƒd­€ÃßID^(66¢±µt”_ŸÏÍ¡nBÝÈM@•£ƒv-wÙ¸ Ô¡¿+Ô¹šAÝ~¹Ë	»_ `xS]êQ³Xh ð°¡ð
-Ç ÂqPñ…GegØ­„Î @h¯VvBß á.þ2‰ÉËär–óUëË@<4®²AÄÆŒC¤J; &Žè#¡.@ôƒ¡\Ê4mcö‰‰ó˜†!M“é= ‹Ÿ 0^Ä,¡‹º‹"ÖI0×7ý±±5EÆ½¿]Sš$“‰h4¼nðÕþŸu
-™_iˆ£ÎÊ6š58ÆhÝ­2Çž?qÆ‰õ;‰Y$7;©Þ(;a¦xc-$n”W‹Lo8˜$·,‹çr“RaQÂ	çaåt‡æx÷&¯2#“˜1‘’
-:;'œ–*«™¦8ÌO >se|6ªAg‰k«‘¸ßlV<Ÿò˜¢Âv\8¦(&Wœ¡WN®ˆ1EÀ;È¶Î®xçi†w-•	¨Ï×Uœ/\?U9_Û—kMÅøˆÝ=ŸÄóE†Ï^ùlÁb6èì+_´¾A¾Ù²yÔ›™RCgÁÝëó)wË~Y©T¨Š‰Ñ`{¨n$‚ÐÎÑn´+ÚI—˜êx¡âxÇðñŠÅÀ(ªëU‚U Fd6cüì¸'ÿ2¹…´b‡õ¢µ¢û°3^³›å5CkGLk
-#Á…¾¤=¶lÄ;µhÍØ îíLkº¥z 5U‹|º®pôÜ@i³8†Ôt"5BYåÏÎe‹“áyHq,v¾˜x£a²÷#ê‘ÉŠçSNecëTæy"•¹«èhÂËûVÐ  ÑnçbnÝk¢2õùª\´ <ß‘ä|Õù³âŽfç«›=æŸ+T~*Yë‹Ë‚\æÔ.qï\æ ÃeËeHm„û’*^™lW) UãWwHv»vLÇ’ƒ
-“Ù~9–\·²¸E&Ó­²X#&»Ã··´RœXpÙ…tõ­`˜òÏ¿vwÙ3ã›>ë"»'W1…ø{SåžÙk½‡´“bçJÝZâ³wüÙ8Î—úØ¢½âúêÜh|¦ÛùjÄgS:½ÏË™ÁJ}ér-0&mvÌ„¶÷0,K–=Rœ wë¸£¿ëeÄÌõÚ‹ëuGAYà‹êRÊiöB­m.37JßÕÿ‰D°àa~ð¢ƒ&$Î40ßu«Ñ„Ò …ñUºZ€áò92‘(ƒƒ:F¢ §9‚Ó*®¨r4Ê¡ê	[Âjoš¤Uþa(øhU98¥b‹)U.°a„QJ7ÔÍÑjDaaF“É=‰búW©Û_ò=ÖOò=}Žø“aâP†Îöop•RÂÎ­Œ*Ê}>*çVù)ò¹`·»»J•nÆ{K¤¶DŸÍ»’u •Ä™o«%Èz(yÓ­D#Z›±lâ$§·°-i¹Åº¬n)Híçì‰?™èÂµÇkF}Ñ0ÛFÀW<¡r_MQÎ«/"Ñ ÷ìí´| ùÐá¥”w¢5Í­«˜,(Z/	æLED"IùëþÎ-À)WX0pY·'vÞúÃíT6Å½cO—SÎàéŒ²Õ‚Ø.ñKe…ñÖŒ·ö~B=rÚšB)U¿­­Í©ˆ
-¨œkUr¸CŠÒn##Qï„—ð#?\ExÙ†ËàFñš(dý¶µ;ÐløpíÆ¹ìstÇâ4‹p*‚ÀeWÇŽyEŠ^Îi×”NÌøkP~ÔVBò7q“mGoÎ4Kä[uéåÈtjjÍím­ÁòÞ¸ZÁÕ•ö¦‘«]½n¨‘ÉÓé”N zƒë|ÕºéZÖ[Ž†F,ÿHÐ°ýaìJ•LØ&¬Š>Û#»lÖ«:@`óK²ºÉd¶ÄdKð‘Ÿ®JÑ–ôv*œŽàÎ‰‡iÜ¶HeF“ ®;`wü×™Lù{‚&c].·üp&ÙÒ§Õ©¢Û ;³6e²3ï¤vro)KOÖ›£¯ÁÀ§ÊÎ(LxÏoè¨¥Å ÛA+ÙïC¾ÎY­4úV<\8HéV9Ûôëš~Îï§Ã¾²8‹’{hø´¡`´oø‘…)îÔ©7Ø@qÇ]ÇhFqg¿½´ÕÓ)E<Å¨
-˜ÌDÍ)ûgu™ÎÈ\÷K/b;%eôSöÖÍRÑˆÌp¸øë‰Ô •Ê—"[NÊ6Ó†Çtä1xŒ»R&2GÉƒÐšpÔáqYB;G2r	>\UÌc%×S;Ü=ødº™)ÑØŒæx4<²óå²õ”6ë–ÇL©ÜqðØÞ+€p‚Ÿ#Ì2¨ õchJ7ëšux¯LèþXnVC-ƒ—$J6÷Û¢¼QY©oTËŠpA+ÂîPyÖ­G1GùÙ*ªªà^AGÚ‹aZu3ý5b²;š¾Lþ¤P}é_þáçÊrÁb«ºÃc†ÇŒ…øú#^ïîA©îÏ²Åžî”)U4WªaCQÍ¨,û€»r«Sp‡Cíf~W*ÌÌï7©¸\~$ž„VÜrÙº„¢P¿ÍhD#ôl q_!ñõ	ÞØ§V7xÆc_—ïÍ,“,$¥ðŠ Þ¼n°>C¨xšâ0?ˆ`Ñ‘ÁbeÐØ±**Š W…Ewh`Qÿ "ŒyÅó)½­ÄYQ³Ã•ëCë–Ô@â,ØÀ×ÃÐhEž¹~1œ»]1\‹l¦ÛÉnØÁ~I~®Äâ€2eaÈé+Æœf!çÜ]›Nï+¢(êîöIÿù¿!¶}k;ÿÎdJq+ê wt2ÚLÊ„ÆA0LØªj®æ¿(è2—"n-óßQT\`ö4ÚLQ?¬êtC^#›’º#dD-ü»9ÿ¤èä µOùªuyvmŽŠ‘š™p$„¶÷yµ{œ@óª.õv¡Lk™¹Pûq¡8¯¯²EÃRæRí…Û¥ö¢è×D>h“ûMÏ)r(LOòÙyèn=}ÝOòQ©ÀÁeWT‡C®0ÑBƒNSÉgÔR=°':@âM±Ã:…<¯¶ùlPÛÀHv#±w>Û#‘Æ$MA+QºÚÁs«ŽùVµo%*"ZëUå?(·ÌÖ“ã†có4»è&cÔ’•¨œc+ÕŠ‘¢à#õ4O3K'*›³¸jâ½Ååe‹mª›ó1³XwXë©Û0Ö/Ø±Ë‘
-vŒ,„"ê’{0è[]ë%$Ø%ÿqêóÙ
-ˆSõ­‹EöÈCC%ÌA1Á1s;ËÍVb‚‡)¢Ó—¢€
-6ã=QBÝõÕ'Ûéæ¤éD`Y‚A“¬µ­™.7âÍD[CaMij«:gá:Q¿2)Âçäá
-2Ú}ðŸnY­ÎÓUS@À£­ŽxkÇ`Æƒ'Ø²-nØ}¶Z‡»¢¿²èE«æ?ã‹"«á‹9*Am¸ø¦¢!fÛÂt¿“y “ÙúbÆ;¤?“Á93GQ|ãÀÁÄ@Ì™ÙŽ]ngj:Ú:¸cŠÃm~„­d6§á‚e`ZEºÚúÐ¹Of“54õCYF
-Wz"“!l§©íµç“éf¹·ÄdŠÓU5îÁz˜®2Õc7{ðÊLy Hd,ž±ˆ¼L¦ •ý²Z·ÎºVL7mFÇÌeÝ¢b8HSSý†cµv_ˆ¨[M#DLòîö„Dà‰›×ÝO‘0•S+[ö§ªß²ìá>ÄPøXo])ØØÇ|¯š!ñ+ËB–Aš—
-ÏYUZ_46t€Å0!Í|í³”ºÎþ®ÆDmÙËŽâ„=È<+:'à¿+ÆE<¤NU÷`(ISXšƒ„óü©‚ä9äË™ýN¸[M;³fÙÌ1lvl¶Uñ¼ªxC!i_Ñ@žZÀÙ•¢R02AàWò U"®:¼o
-stâ±|¸ßËË^(òÈÇû­¶ÀAW…ÜÍ–šÉkFkLÁ¹‘†046 ×"Áž÷iöÇrBC*k>Û±x¸£¡ºéY‡¬¦‰á¿MùÃ!YœÙbÁbgxR·Qž#§1½7,¶‹±…<¥ÊVÚŠBÄŠ[æ»®éäâh HçÞ¤±–Ü²þ)gÜJÙø|áê[¬3Ê<&N1o:ñØRÌE’ô*¨ìw`½`³eÝrWTæÖ`2“03T¶¾¨^Uf
-G¡*z–¾ê “"²´JÊ!ÛJb¬	GÛ–ÎÕ8Ú …Õ•ôË#wˆR–JJI”nä,‘f!Ùl@èeVBò·µýŒ¤)Íâ¸’{k”®¶Ý#(%<¿YÂ3=‚NxË‡sóœ\âUäZR—šBæýÀF{à4¦ÒŒóôö n¹?8…°ðƒl±€ÂÂ›ì
-M½Ü‘ ¡.E¼v*ÈÑnð¦žÖ¤pÒGNo¹”-84pxpè*LHØ·v+ñÿ¡ã*±‡±n#^4Äé=~x")ž½ˆ¿Ä›Ãî( ñ·ÜãOÚ95n³AÆÊ–ZÎWíØÕ~p¼z¤d&>ÆêÕ]ëÂs–¤ìÇ†ÂW³,šV$‹Ëx.[l¿$ÜäkŽù6¾z}<åeVª”ìŽ¢ZãØÛ®rŠ_5P®›(í~Å¯8Šóß,,¾X.ÃEÅÆóQ³€h@<l@„ãù*íZ86%ºb¶­žÇ!Ô óªŸtH¡©ýÃ¦Ü£W’ÅÊR‘Â#†Âî¢WÅ#,LEðÊ…³Ì·}uìÊóµ‚C|?ƒÃKÉÚ²Ea|„+[ZhWúÆ‹üÖJ`PQãOvñÅö[©{ˆà¬Ó~™†ßµß‚“¼/b–ÐˆEm„ñ2d¬lÙ·ëßŠÉ-p·¾ðEëƒ6·Êè´É­j»PáQÕ¯´÷´Ó£2Õ¤;U“îs=ã
-œ½”ëoãPñíÌõ2Ph p#U£üál³Ÿl¬ÿÄçÃlŒ†O¶$8VÛcvÄ®h¨Ön‘«juï‘¦;{Œ_žoùÛ Xì
-Xï…ÅLð‘°˜pØ„Ñod¬ö
-ð-4üR]zÀ\ÿ±+ ¬#pdÌø ÀÖ•gU*ÛŠ–/GLxöVç´‡pºG5Z×U­ÂŽÖw¶«˜:¢€•FäuÇø‡ˆ'	(Ô·\·n0ï”ÇL¾ëHxL<TÀ!±²EK~dª¡ö§1Yàdzu7Ÿëm3±y†•-bT)›Â`(¶!g;³ß áûÛRETzø,]í@êÁX†+[º–zP9Ë°u(¦3mXÂCíÎŒ‡!…Ft®.µ>1SŠƒ£8¸ÁD–Ñ:4ZöûéUTTtPŽAˆsE=Ä±½ÆŒk \·ŠÝËlªÉA==®úÒM)@#úÂÑŸù0Ø©tµ3ª(†Ä6º‹GÊ›Zm…D%‚ÛZ}1«…*rE%{ùH‡fªë5óy/l¤]¹ÉX‚4ö‚ãÏ¡|åIWÛWÙ3<fxlg{}<7&2…7VIGŽË&{]oÌ±Î=´|K4¦<\E§œ^+èÝ@;mãŽÁ•œ¦’ÒÞ8—®¶¯Ri’+ÇÌc{ß\b?@•—²ESÇf.”¹PpE[ðÏb©3éê›p(+:ËæJ™+õ~DGx¥ðdCEá¿JÖŠëtÍ”µ…§[Þ&Ç—]'Õ	^Œ„x¡ÆÝ}ÕJ$çwcãÅ/áºû”Æ™ú:¡#¾N9Àùó+â*²‘ž«-™#å
-ãfW1{ÍšÈ!Ø]`÷]à	cþñ‘—IÂájƒu	µŸ|ŽøsÑ*º2TtøóÕ$*ÚkCº÷:¢»|<¥ çaÐ+­­ÕÛuƒrfÕKM"g%E.A=÷ð'Ž6ÄiÛ¯€ç;®/òÊÙIÇëwÏiºPiÄié}ãÀg¿ÊÛ¦2{$£2Û¯Ó?T—ÊFƒµ³æLfwÇd'X=Ÿ¬'³ *\£'—)4OlÄº‘XdcÛC¡VT´ß])ÖÁ*w÷ôäÑ3™­¨¶áª‘X-ŠÆâé:ý3™IP‚LÆ™Š%“9@e×ùªõ	µ&ö»5™R29nG2Ckû4g³ý²“oYôÕ 3¿:ƒG \a~fÖÍŸ6¯…K2<W½¡/ÜˆU wæ¨g¯†KuÂi6ŒzŽ.œ¶öˆùÏNøDâÿËÆ¾ZIÝR(®ª	;¨,OêgÝÃÔ‡Š«iX"ø¨íÃ$¸{ög˜E3€à~’®üöç%çÝœ×dàq40qÇúüvÃ?=nêT¦~H=¶}KÊ¬žc9**t}˜Ç•òúÀì~1@éu‹µP‹è0añ€£³¿T—Þ¦tPþ‰ñWÚÈQÛžÑ¨IPâËT\ý9˜lÌû3ºqK‘’©ž/ÿCö€Í?ËìÑ*Âµây ^“†`K„¶æŒmÅ6õGb­½=tÊ~ÝHCS¯î@Mý²É"Ã šÑ¾Áú*ÙPðÛÏÙ²¤3v³Q’ÆØmÏÉ­ËÍ9~¢¢ç§KD†¾â•Y©°(€OˆŽ YTøÜU»³”Úü]¯vYGÆüNÔF¢¹u“åOì%ÁóŒT¢ù/Ýs\ú‰¥Éc¶EÜTŠê|a ³£Luë|×ˆéži8£/ Ëý§l±†³e‡¼ªw°Ã‰5{ÛRÜ6Eû{ÆpÚÕƒ—êstÇâ4‹p¥ÍD¸TùS’¶ø|¤d&ÞAù-;ÇÿD2þà‘-/ÜŒeOô‹×æ­‘S¾\sŽúÖNÞ##	OîráFÞÀ¦¤X<iýMJp´©jè\ñãŠ¡oT6&ÅÈ°¼^ß+W‡;’zðd•Ô³BNÔz¶í <¤RÌÕƒá¨›§ ‘áø'){N¿È—;Mq˜ŸA\†ÆR.“Ø&U.Q*—‰ýnU.Æ†ËŠ”è/ðt*ž¶ŒÏ$6¾–ƒ­œ †=®×¯öc8COhBfyºÙ Ÿ½{ôßo 6¬MÅ|¾mœÐVôVkº‚qy&{¥¦«‡„¶iÉ ™-‘£UÁl ˜õÇlv“þ â@]¼4­´ ;GjSB_#Ci·{†Hí g·ôAj*é8{â¾è‰#G,Z¸w­vwÆñe´gø‰&hüzžÀL¬/PwÆzÔ¦µqJ«ï¬‰áMã¬­þôêïB	UeÆÃlV­Ö[3Äà£ðl°ÙÐÞ=ø¨[;ZZ¨5Îý5„&o&m•Ðjá¹ðù¨CÌÜeu©í>C±pÅc’†ìíiÌ¸kU±êÑXK	k­³½¤±åÓ)G9•â3œe	*-óŽ]Î²ˆåX#)È`wáh÷ŽùÚ ·ß$®²c®µÆ¢…2òÊÆ±p¸ÐÐ¬S—¬v•Í¼:|ÁÿÃ¬E–LY˜—~tS*rKbþ©A%È¤«Tm–ëÐ°Nýq}Ÿm}uV¯d·»ËV}…½ ºî S9PUÙ˜«ŒŒ«*#^¹[$Ä¬þŠWõ`w”|Û3oØSœ'Hb:e±5ÅOtVÈqóšòãŠ™uÇ}>ÏY’²hD_(³’¿ÅÛíkïÈä¤$W}‡DßÏ‰õØÒE†GÚÍ=®£VRß•¼t‹†iåGœ\ãäÏX,­´O+oBÜVá§¢lK´9íaP.É{)~ÀOÿð¦¡õR¼Ð”Æ
-Êå)¢—©]Ð)*FøïÐ”Mî& Ã}|Ýb]®º–I–ó6'óÇ†àö×{Ðû‚ÍØÓí3˜F•-wêweæ­È] iC°×¬Õ(¾œn—J§v©“3œä.ÌM ½Ê‚À©ŽBáN‘g‰Õ¶+ˆžUä}äM)©Ý•ì(LÙùLE~Ž@Ûb··3.gDcQçŽã3gÏ 2×sÙbË³…äD6nÒ:ÌÏýæ±Ëÿ  ÿÿì]MoÛH½Ï¯ ö²§õ²I‘’Ž‰ÉÌÄÉI6ÀîE $FbL‰%jû_ö:¿cþØRŸ6»«JM‰l6¥6‚¹4=‚ÜìzÕU¯Þ+1·‘dñ_J`XG«)D4ÊUF~ì°â¥˜î„m>ª×ä)ä>¾A-˜ØÀ÷–Rà%
-Z¼Rs½¢~Ÿž4 :^†]èbdéºa€QvËBSÑ'Ñ¬çWˆfùµLó9DSëàQÝ)¥´]BÉI)ô¶ÍS´ÒßWM%Ÿb‹fa2ÇÚœŸÁÕ}Pü’¤Ñ\aH¬r4Û—Ñ<ÃWY©z5fëV¦PUQwS]XÜ¾ÆõV³·Øþ¦·±9·£¢nýO¢bŠtóŸmjàuÜÐB´[mºØ9ªYmÒÅL8¬‚hUÉ'¤ú)òÃµ;yŽÙÅz¯œI~Tòu~M?(µ-Ü<žûÑíÞL5_gh[l|G¨lbKR»CŒk¾S)®¹F]®Á^E¤¹@nÐõ9ãÃ$K'¥“zÂðÈîyGfAá¿‡ªW¸ç[d÷4}ê†¨&uÝ^Ÿ¿³õÜbŸ×476`í1ÿK…“õE~€Ùd<<b½Çà­V¿!â¤äªå!Žwz3·ûi¾Ò_Ñícbô"¡Ç•è|žžÓui.7œÐ»(WßÞº4‹3¶–’$Ùø½uú½"¬ñÃ¿ÜÖªðºÐ¾õhÃ`2ð´n–Šd·íjLJ­… J¹þ4âÙ½üè^žêŠŠáýbÄ“Ýí¢ÖBèæv+€3m¬…NÜ^Ø^œd×Zk®×/l/Ï7€yâÆHèeÔi`òLÐ	Ï>‡¬Ýë1q¡ûV	´¹´-ÚºÒÐvÙld{ÿæî×ÒÈ¶þ%sG+<R°½™d€Mq
-„LÞu‹2><®Á*À5u.'ívƒÝÇŸÒyuS€Íï«Ë<°50R-­÷}7µùC–ÿC0í´X»Ø eN•PæÝðS7Ëö?ˆLÈ,YXoextnÃ2Ç]Bo§aþM‘Ù
-¢F…7^\žOÐwŠ¸Æ—á„¾sÓCâžÐ­@Xò´±Á™¹^‘,"ça¯YÄÃ7×»LP{ŒrKò°–²®blD7¯JuAÿÆsŽ¢›Öê‚*K¯“?"ú£^êWoÃyR¾þHÄˆ—žÇq¿y–ÜrÁìü~Z1-(@ÒOÔã< ?
-êx^qâI=]imHEû{ªëò·hø‡ëÒ}WÑ|0
-Ò8ÁnïÖX·Ð#'Ý®æÉ'íã
->æFw!³¢8‡òC„8ZR>)Ä%„ìqÍ<&6À®3]œ4žd1F‡Ä?êæ8PÔEÎ‰ƒÞq"]³qðüìÿ¸ŒøL?€T€@úAK`ˆJ–C¤†|îÏº½b-Ë“ªá»h˜ónœKsª`ÈþÎ’gz™[$ðSmôgA…°`=ÁŽŽ=mçÛÑ©§¯á<|„é[e.ô&¥F³‡Ã$˜Z¿)T;(×¥YX÷Á:q„zG~=c8îQ¢fhÔsx6ã¦bdóvLÒì‡=Ï´Óö–Ô©Àw×¸’¶_Ü^É‰6=îeŠ$ë4µq„ºÞ‰K‡
-U2«¥#Ã@(«¶:ÅK(Ûÿ ¼ðl=|­R¾A±ÊßQxÆ‰à3‚^%øô:\Õž§Ï•¥°Ï¥¸š¾·Äµ›á-·®À2°9êœœ³¦ó×w5%q2b@v®î±lÓ¿Uf@ùê,zÁq03#N{(ûšÇ–ù4°~×õZvœª4c06Ÿ¹;.­±³æ<Â-áì)'a®kB+b×g…„ÒTµñÍ®C³ætÆ3ETðl™dé`€Í7}ÉWÿúÓzƒÕ73àê®g®¢•¸ž'Ì™ëYF›Æ¡õ:›ÃE•¢–Ùr9É_8‹§ô•ä+<SX.‡g¨=;Ÿ®{¥Qï°8(/jUH0¼ž¢ZjU6³³˜TÇ=dL0lC0Äs¿ÍûY~¾/èò¹ï¬*Ç.í¢só)ºÕ2jJìñÍ¥ø!DÒø!ŽW¼µñ²àˆ!¾|HVˆ}‚›Á1GF‰§ŽÓÆt†D‘§Ê	é>_¿Ò€¬[º¯Q$Ã^û@‚©„Sú~µ¡ð¸g¸‰…Ï5{l>´F[uñ—<Zëk˜&ˆÆ¥DL¤‰¢Ò4sìâ¸„#Ö9:n¹¦#’k*x)ÕïªÈjÀ¶áç”²ÎÖôw¡<³¨±Z¼éÕã	:ŽÒXmŸpÑ‚ÄÑ‚Ž&µ»ÄôÃçÿ<¾¬ÅzýSúÕ&ßtV>’Yžæx/Cíc³lÝ)ïiÂf¢Mý£%M±É4g&8ðY?V¤É"ÕB
-QÅéêC‡‹÷—8óput¿PåÀ1s¶^>¢ÑÙ«C¬;`m¦~ËVyæ’ñG®¶#eðªÉ+Ø»$N¬÷Y0—)RU4$¡.•ß¿Ë¥™:„š`ùÞ§™:¦8¥STœ„ÙpÆhÂ/™áh¤.×¨²6åÝôuWôÐ*0j—lT¤l”ßE£…õó-Lì *öxHô„‚½ÍŠå^øCçvæõ‰w²e*Þ¡HàêA¾;™?ÕQÛ€SÅj«õNëo_
-'ZIPDg-Iœ¦íóBnŽÝ)òùÙÌ^	ã'ª´¡hw™ž0‚¤†¤q=ˆ.ßƒémÅNQz¢Î(v}™ýc4‰æìÏZÝÐêÅvV]5àXÄ1Sò¸–Ì¾* #=w(wTœl/m\æÑLR¬›9¨Z·}þ ­n¶;5áÙ³ùvy
-|TZ¼›ùÝ"±€'S50MkêU(ª­¶sÿLÕ¨["6&C½÷’”X²:Šk^ÏàÚ¡”K…4K6ÕûpýØH¾#gSB¬_<\÷žÍ\K™Ã…H¤êÏUÜ½¤åéløEYð,c§ÐÁß”áœzf
-³F3­þò#öŒ·4˜æÑ*˜òý§ÝÖ«X“øÈzñ±DòqTÌÃd÷Ëô>_Éb|°‰ßÁÕF2z#
-aU[UD³d>Æ®ÊŸàe\Ò.t´§Â£eø:-¹|Oåñ±#¾8Ø?MÞÞEÒxÛˆN5=¨>Ÿÿ@ÕÅµ},üuž¿*ªâ`¥y»«£á¼]'Nýß¾L³4˜IT5­Òñæ?Ù#0ãZÏ¡Ž`fGõú¨@RVz ÓÁƒa•^5uÂ6Ñ§|Á
-ß\Wh‚±N±	ÆáÍ5M°—G¡ã2‹ÑËògh±nÂ6d2	½|ª{4¡¯ÈÖ¢ê&¡/<ÒòÔú†ƒ!ÁÖvð`èñúÚ¬k‘®Mò*×ÇÖ~
-ƒe€£ÿg³Œ£×&°br{ÍrûV–8ñ"±/CrózEŽ›+í\ÂÃÏ»´ÔO½°ŠCÈ(RhžÏ˜í’»Û »­ŠÖ…bÙ"‹Ã`‚Á–Üï°ÞaxöjÄë¨Ñ|Ñdb%’|¿AD3I¾ðÈé¶´ó‰õ1gQþ}îÃ`’…‚oD’-§A~¤×¿Å@B:Œá'Ø˜²Ž],nÈ±qØ‡Ä@¦‡tXnŒàý%Æ’pí0W´÷Û¢Nö~Í¶W#ˆ›eË`>þ3ÿx/ÌjwsÝºéya#'“D“oJóCI²]é+6]×;$“	_‹K
-t©ÀPhl$L$,%­ò!B
-õÃÃ %«"¨ÆÚ^‘Ÿ#ç—ã üç¦wé‘P‰‘Øã“™çün{Û0×—×Ï“EÍû -Öí†'ô2Cc%†"Ø13C­€±“Lýl<ÎõÐ8çðŒžO×/0Ã‡Å|Sž:×Ò µ)ÁÑuŠ’9<†5 k/b>ì×‡a“h¶f”# ö\=¿EqÀ#Üµ•¥^Ý1U)-Alóv–v¥Â›,‚ŒŠï“už@
-ºÎöÂUNŽ[A kN±µT'ø<!®×/öÏø‚cÝ”-ˆý:ÿ–¤Ël,ùûb9Ú-“t‘ïnhåÁ#°FÁ*Z×¥ÐíS”oVšXß¢õ¯O’üÿõÏhå¹Œµ×ßp˜†§ÞâÂ4Ä´ ? k{ôû<Šjræg.q/÷¨AüÛ¾Ÿå©V¸ôiGèC;½"ÕŠ¿ÇÁ3¸Tœkˆtçï.‰xÏÍw¸Ýí;Eäyt°ý\­(ä7Z` ¹Y#ÁÂãÀ1 WP<Ì&f%ÆÞÞåLcMã)½ÏÕ(˜åÁkVß‚«uHàCU¥LK~¨Œ­¶‡ªþ
-	QæÇoÑŒ¯8vQN–¶ã£ÄÙéá•4«ñ‘AŠ‰€¿½?Ÿ¡Ñ@_7Ó@l–Ó‡ÌP\ªÛØ„/#Ýgà«$|­_O¸KMÄ¸‚ÁçþÁ³­fÙVr%~µvaç³­t»·+›_åor&H0üºY¶Þb“fJ#¢LÅ—·ãÄbçè%Ùe2Ñ4<Íùð»Sõ-&ÂEw¦~†÷j#â¤,ÅÐ“B`&[Ì‘zþˆÝ‘
-ÆIž³,1GÆWðrý²ÛðÁ’Q=êH,ï¨Ä¯¯o 
-yJ§s%Møý1Ì3ädKXŒ¦Q(ø²Ñ,Y¸üëÿØpò?Dr:7`Å¦KðXS0¨@WÔÈÖ¤ëŽ9Â#ÍÈŽ‘/„™üX§{Zy¸Æ¢nåa2’a’æ—cÔ]ó5¼¬ ÅÜ"b_" –¸<ˆæò|ññswi2ŠR%(1:],9i‚â,œ±q½j}Äª‰ªc"ëHÅYb“JŒ&*
-h‰‘2<&
-½f×-†DžeÚÒ^ó¥†Ä$ÿÃâÝf`ñ“YCÑ`,4Í•+‰„õs¥(º5å·	f÷éy28Ì¹Û©10ÌÝlö4suaXxJë13Ñnkû®]ØY¦É„œ¾áIA ìa¦ó`ü„õ^Þ!ë*\äà¼ÞX®_	˜µ¾­9Í#f'ü°V·á©©šã$<Òžã”ÿMV 4ÏêÐjíóË0Fî9U*‡`‰%®·Èø	g×íé–¹›%ó+:Æì½—
-„Æ!ÎB•Ðz æ½ø¾¤ï¹rº³W(ˆ£G ÌF#¬¬™œÐ„Â6Táÿ5ŽæáñÂ$Œ<Ò‰®Ï®Wµarî*]tl¹uR&õ)rÃÔKÖŸésxk¤Ž]Ìè/dpùBì!‹Ãy²BŸß!ëµ[šÂá5Ã™º€Hf2ðð¾³#°klíš“&³Ç+¾Yø­÷kû@¸Ëœ½ÆDÂ–FB*÷gÑ×+RC§èJ Aj¨g$”žä[øµ{¯5Ë£$Î_=©ØxXù»œ-ƒ“÷òÏÍ¿G2|Gbå§ÝÖoªµL)äº#¦bKaBëŒÂ­™¹§0â¡±{i}°v1²)&ØñN\ª™¡íB!Ñ“ˆˆ%RÈ£r–&…¼øçùWiÜ¾O°µòýâ Šœëºa¼|cÕ…Àðaš'°)ß€«
-À`¨i~h¢¡®²aŽuDFHÄ:>#ìrîGr±Ž¡F´ìòú(5¡¾µ”;#1®bs[Û÷Š\Þø¡:ˆnª—%ë ÷áÞøÈF£è1Êë[¸ž” PÚÿèT»£ÁX˜8?ØýýNX;XÖ®¥•ÁLòß’Iu3Ò"<R‡e-*xÎ(1`4(2ž çž¨eï¡AÑ¹´Ü^½–=%º‚ã·³^§(ò¬¼€žp§Ç­-~œ†¬ú\­[mÆ0“#Cô¾S7opY©åÞóÍµûd,4,baœäBÔóí\­;:`,Ô³|eb¡™©}þˆÝ¡Z¦áãäH}Ö¨¹1èLÉÌ‘•è¹ÇŽ”éé{¢Th¹sd6š`¥EíV&½À=žŒ#ðJ\ª™# Æ@™+V‰xÔ3ÌÄ@}c Þgi<!Gé«°²?IŸ’Z2tð$ÉHÃ–8Is’4=I¥êíßRë>šd¡Å=Ä ]„Q#…Ù*rNûü‚»i0Ë¥ë¸SZTE~_FK	˜$ðŒöò(‰ã©J7–7–9Ö"\£Óýr†Ád°B€îu¾h}Åèöõ(x'c˜cðîðN“%œÄð:O0ípÒ<&6 Â¢gèÔ"ç£ÅµÅ¼‡ë÷ï3×h…GÚsŽƒl¦Ã`4ÅŽö€9Zæh™£E­q8˜å/gÄÏ4ìOÖ]h½‡Öën(›ceŽ•ðH³Çê§íÿûÓÿ  ÿÿ ¯Yê›
+            stats2023_24Json = "{\xœìßrÛ¸Æïûß´é:–¬?vgza;ëÔ‰xììvšÙLA2bŠð‚¤S»Ówémnû
+y±‚THÛD+…#½ÉF–£0~>Àw¶"Î"þ¶õWï·­öN{÷U»óÛÖ_ô_bÎ&Ó—ß³[ˆé«ìö–3ÅBŸGi°ÕK_Œb¦b®J±Ö“Ø9W>c6æi¨¿›†Æ’ÙÈì£HDñãßù¿n¹óá›bÔö³×žŒŸF‹E8>¸§¯u·÷ûé‹#¦¿ëE)’îyÈ/GL³÷èfïÀ‡ÅÙ[Þò±àÑ¥/u°xÝ8/¯9ÿþøÏÖ_þà=ùOê8Òrvíî[­¯÷7oëßZŒçbw^µ»/»o»½J±{Ó×ŒZwbw–"vwÐîÁbw_µ{/{ß"v§n±» Ø“Ø]³ÚydéS;‰R_‹èV†âJ¼4F„Ÿuÿ^Æ<XŠæŸó‚Ç‰
+_³˜gƒŠ1~~°{®~cßÿéù·¦_änd8LJß!d“ì=ßÉðÛWïl»N'@¾V
+)¤_y¡ÿØ>zšh½»˜(¦ß©uÙäkí<îÒïÖiÏè˜M%¯ôììÚ}=h¯k–ê8}ÖÑý¹aœJÚÛn™ž‰0™ªÞï•>™ˆnNùÒ—ÿÿöáÁåå‡ç}ŽÄëÉž?zþÊöÙÏ¯OJO<:ÏæÓýGvÃ•þš‘žÛüù˜éŒ»ÿ †Ùˆò;+Îß	ÿÆò":’*äÊ2äŠéÉëŸÇ±âŽ¥ L‚ uyÍÏžÛŽyaÙ´;ðÂbBf:³˜ –špY3.a©	–(`_KÅw|ÀüÈ‘y©ŸO"Ù6g×äÁæÎ>qÓanæÓ‹ØÙ;ír?kæ§]nb(
+†ú,bC. €£9=?J%ÂæØ¹[oÊ¹Ó!v:ÌÎéä2¯-]ËÚ²¯-í&ÈÙƒÖò=—ÑiS{ÁßSQ{$gÇarÚÔÞ³¨½[·Ú/äfä¦Iíµææ­þ¬|¬£Ì¤9=Ï‹1Þ©t¢jÛîV@h¿zÕùˆÐ^¿
+BS.¡±Jìm7GÐ­3©ÊOÚÄPC‰ ö²­Ë ~9× í;ÐÚKäh½â³í0>a­]†ç.O“Ö•çu#<uZÂ¦1šóò fA*â˜¹oDf§Fdê¬¹;+F¦SYçÖ%›è€‡™Ù`çì/7‚3ŸcëÏ=‡ái×'@w¨]oœ5é½ÖèW¡þ\<ò¯¡òí!<$Çé¡ä8lŒ¦»5ïîR×áî÷É…£8‹¸V¹]¦(Î*®Un—!JeÜ¢šfCÅÆ³•¹¡gÐ€ ÇB~ýšch{·C_‘RBê0B§>ŠâLFç)î2Hq¦£ów™¥”,
+™Œ Œ¾6Är‚ž„úÙ5ÏN•rîî­ÐÅ—é™M-:}Û7-ZÓÑÛš‰iÑšÎÝ¢€åHk£¿T¹=6‡sdž²±Œƒ·FdööjEfyCµQdœ~DEÌ­CÍÄ höÜP6»Œ«K{×²ºôáÕeo¥+y3¿‰/FM‹Ö¶Ô~ÅZiOž‚:ŠM‹Ø–³mùe1±_ˆM «Ï#›„M?}*A ¸‚¯¬@#VÏvx¾ X;wÃ“ªµ+Ì7áÆéB-ÎíN‹Ø.×hqnvZÄv¹<K[:EÄn"Ø<1FWƒÌ*÷<i“ˆI[››ALœ»šH‰IšÏÍø <sjÆw]ë\¢³šUÖ–oHÀÐìÍÝ×,—ÍÔ<8ýHÐlØWˆ¸Y77—âãDè\ÐYˆè9ž'áHª8	Y\æO‰žÙ6c¢˜7^¬iË<®×Q%Ã2uÍ\½Z_%½1C&¤†P»¿ kÇŒÇlÆL(‡íc´+¡{&ÖÒ%–M‚-ÞË 8Ëºx/ƒâ¬ìâ½JÅÝŸr8fúsøü`Œ.ÿ
+¨‘ž­~zV/ïîõçÑ“ê»tôå‹9°¸8nC„ö
+(|äÙe'"´W@Û :ÈŒ#:}6Ñ‰ï4Q8â+Âg»U/>i{ÔlHôÜ¼:/Zzâ,ó¢¥§U^'è9bzåÀk,Æh#Ö	fxÒÑ¢ÍI=É:¬Ö¡d°‡2)[ ä}oˆ­ u:È“.!”J%„B¡Qâp@ô2zçÐiÝeYQwãj±j!zÖMÏúýžœ‹˜3Q03¾~ƒ ,ßžñ›o“;ýô’¨±ƒ·Uœo_pðvnû2:x»Bræ³<q¼µëí2?q¼µëí2Béàíãé!Ü²<;dŒæø<“án)ë\;³©…œ8³N‹Ø.SgÖiÛedRÖù$ë¼’ñÔpåÔÍ‘ùžÝÎž'¢ãB„Ì'hAdN§1³fÚÔ&hÖM›ÚDMÔô5b­DùŸP¤š@<'gÚ4½1nî×ËM2½uœéÌÂ‡Mœ5ZXk—¡‰³>kí22©6[ ó.­¾ÎX åÀüÕmÀ¿ÏŒLjê¹9Ä$ÿ>òï[çt“üûÖ€ž‘=£Ð¥)XÜJQ2á¬‰àòàIMV6ˆžÅôÂ‡OœIçÁ]æ'ÎÌsŽà.”ÒÏGk®Æ‰~Ô7‚9¼|[¡¾¡”nAÉVˆl…Ö7û$[!üìdCyn±œšGl6ÓúsiØlUÁfo§*6ûsOÕv;U¸¹HÛ•ôaÓ†Í|rWKglKÿànË8N+[¬jãt²µªÝÕ¶0s1µÉÈvQf*9;¨\˜‚«¢f¥fe/p@Ø›GMÊ6]Å&¥›Í‚“òÍfÑI	'xŽØÃƒ ïq£+Ãg§V|ÒUNÂ'á“ðIø$|.ÞD% Û§ßþ·‚ƒBfrÖi‚ÐÛîº¾Í9ÛÖ¤ÎÖ<pÎ¾’Ö)ˆO	áä&âSB8Á‰ø”‘ó1ñT<ª2®=6‡s‚¾á¡lîŒ•m7(ïÌ¦Á³xZÄ&pÖN‹ØMÐTR¯ád!taŒæÈ<eb×:Íçƒzõ"³GÈt™ÙÔÂ‡Lœçƒ,b»ŒLœÇƒ,b»ŒL:ôÄ¨6	„^ÿî`¥6áB}RN¹ï7V¬mõëegŸØé2;Ó©Eìlˆ°ØÄÎÚÙ	‹MìÄÁÎëäæKÂ@ï= ^½‹€•ïy.¯JK¦µ›CÍlfá£&Î"­El—©‰³HkÛejR‘¶ æ-×jÍ8äÌ<7F—ÝÅœhV9Ô©ÞV¬3™*È\äg3‡‚0gcœi&ÒÆ(8ÓL¤QÜH3OÂ‘TqÎÂ–€yÊ#MîéUŠi"ÅÉÌ>£™¡B«¤7ú‹õú&¯ÿI„âAH/”w|¢ÿ¾ g¯¸
+Ù€ÙÃ,øí+ÀÙs¦–boäìnÎVoßéz÷Î¹œmÏã,ÚÃ·Ù´ªuáßmbá‡íù\NK-b÷-b[|¶æs9-µˆ½o»S·ØµÙòýPZÚÂ˜–ŠHÀ-¯ÏÑ%7Q¡íÏ/äâl¢‚3-ÅÙDgVŠ³‰ŠI©¸”Ó¾b3Gfs`~ â92?ê7˜1Z4«l~¾Ào3ÉŽouÈœÎ,löpÀQv¶Û]dâÔÌç÷[#Ó¢µÃF|-™&­×™7LQ¬ä@æ; ž#ó—¡yÔœ)]ëÜ j~Ÿ\ørMœg†¬r»œnâ<5d•ÛåŒ“ÎøLB&c9á ?Ñ¼7†+(Uj	  Š³X‹ 8ëµhJ%ÛÇÎò@ÎË™ÈJŒ„*¸%W„5&R#!œ¸Dj$„–H„•*y0a ËŸ±—1R«ÑR‡ë"f>»ðAgƒk»Þ.sgk»Þ.£“Ú[è|`ÿÝ@i?™Ã ´g(mr@ ç.'^€âÜæÄPÚç|¼ˆ"¯ø´G0sx~ïpÞ;©Éõ¡óûÜÂvÔgµ©Ø8«µ6±>XKÕÚ‚˜_DxUkÿaˆ5Ð ÓLÚßÜ bâmÐ‰šxtâä&Þ„Î÷K93Ä
+tÊÉ2.oR–°©g>dâ¬ÏÂZ»ŒKœµYXk—QIuÙ'½¬O¸â1dön¯˜tñ„€é:0‘æ˜(‰4¿D	LÊ-`âŠ+ZêšÃ+É0[õ“š£0)ÃÄLÊ0)Ã,Vµ=õ’€A´ü`ˆå¨<úSë÷mîè•d7	˜ó‹°Ù6ç)Nð¬žó'„¢@¨þ¨\Å‘~ÚàíM`À²Ì•ÚzïoR¥ÖiŽ’ã9¬g­–°ƒóáš•¼ƒÎ}2‡sh¾Mîô³KÊm)ÿ\GnnéOàsá³r}Þ„OCs·é™Ï1| Å™ƒÚõv™¡83P»Þ.c”òÏ']Ä¸ÒK ÜFÌÎ1zÊ}ö´æÜsŸº9¹g6µð¡gîiÛenâÌ=-b»MÊ=h²F,œu; GäèÌÚœ7†Î^½è¤‹œ.£3›Z„ÎfÐi›ÐY7:-b:Q 3¾­ØÀgw"½ô}>Ð;2ÌAšu2ßp.b!DÇÑlfG›á¨ElâhÝµˆMÇÑ“p$Uœ„,.çv%ŽžòH£„{CáMøPHo¬ØPzzÑbz}Žü¤™I{!´ÎJê÷ˆ¿ý×‹xóÉ•â‹(hå|È@ÁË1{©g"ƒæî„’÷Ð¡6Ÿ]DÛfhk×›€[7pízsQä®crÈ¹ï9œtÚ½1|¶+àó^·óèIV·«ƒçtfa3_ad¿ª¹NœZƒílö[CÓ¢µÃ>·-˜&­×˜W,sÍCC,Gå¯<ä3Ù1,¢Tóé3Z–ß'ešÍ Ó*7%šu3Ó*7å™(°ËDÐ‘Ü:úí«w²íÄÁ"ªÒn:é`,ZOlÒÁ"ìÐdõ³‘Â4`ùÝÈºFtR…vcÀ‰´?Î-R±qÖh‘6#£"mÎ„%›Ç¦`íÈŒÄ¬â=T˜½¹eZ"¦£ÍÈ^Åq"«Ú8™iU› ‰šl8o±%›Ä›Ì*žCÊµÙîÜÚlg‡xéœG¼Ã«7RV"T)'!¥‰‘sYùŠÊ…^’Å¼¡^vcEz]åþµfðj¿RÜKy¥ßR.~?å«+°†ûÉ,\å•ŒD(ÃeQwÃùZL.lK?NÈ¢•'iírnQ¤¤©ÄÞüœ.ÛAÞÍ*­ËškMØeÛá'0QJ–°ÔJ œpá_Çê2A0‡	–K‚%Á’`I°Ü XjxI5\†n£¤ño_½¿†î£0	˜L&“€¹ÀœÜ\ý î´‡yÈyê§èÔ!¡ªÝ'bVïKöIð@„ÑMù´Ørû’eóÛbŽ“›(¥ÆÉMXjâ&nÞHy;áB¯¢¿Þ;pD]=ÍðÜ­7Ûl<ÝM7­í^Îqº`U§ýUm‡ùIþ?‡<à©áÞµP	 Ð×zÈO‡Æ!ECOö š» BøÜ|f3ÛjŽ“(¥Æ	NXj¢æjV¾£’ò àæD$üò`3D_3O¯s‰ÖxÑ{(W\Óáš µ‡Ó¸wí{.«76]EÙt’‚ýƒ^ÞqÖoQJ³~Kí0I©~ûØ……:€Ûžo€øjpI»žÄK§qâ%ñ’x¹Æ¼I­@·PŽ³°÷OÐå]3(%\.Ÿ<¢EMÞÓ™…mÇ‰K”RãÄ%,5á.?³èzÖj6§å[ct5¬¬cSóÿ   ÿÿìÝÛrÛFàWAå>µ±%;ÞKJŽÅ²­²lß¢† DŽ	b¼e>ÍÞîsäÅvHi@)	ÎOü×ƒ8vsj¾ê9tóP“VòP?Ô˜‡šVúq¨é…•ÓXòÁåûÅ¨|ly­²YwÏ5Ù>¬GZ.§Û‡uãeK°Ù>l×b¶›íÃ ÌT£¹ØªzÐ0æ¸¼±¿Ji’îîÌ¾¦˜ýÓÍ.¢Ùšíñ¦›»v³=Þ¤‚Î¡ššd=e¬®É6ÏÓ-ð|ÂÞìËMxroÖS;=Þ3<B9=ŽöºÉMZ5#EZYÏ¤3Ísé§ç“é´3;_nsè	‰çÆî›L<ˆçýÜÂK;_‰x¾ñÏ¶hûœt¾ñ<ñÏ¶hûœr
+wÜÜHŸðL¿ëõÿ»cóc}è0`2Ù¤—ž'?˜©&f¬1Í–X3ÍDòN›"3ÿ©×u^^K85¿.š‚æÝ=Íä• ¹ù0¹ðML:[Ãís¦‰©gk¸}N5	èêt³ÌkñªÃÍ†1Çæ·8çº»›´Ì6û£æÃÜBK0Í6¦˜mÁfÂ‰àen&ÒË“›úÐ¡´d›0bé÷úYÑ 4Ø˜5@±dUƒÕîlœÅóp*mÍ.Fƒ÷ÒKÍ®ÍäÆ,ÕäÆl÷nrc¶S9¹1‹aç8ÓI¢‹<šHg¥ ™ÉujR–eÞ¹{A«Ù…–afž°áÆÌ=ÛÃÍìAÐHçyJ/7Ïíè?ÿ^T }¹Ûäóß«ê1ùô²¬ž×©'æã“–`ûœxb¾=i	¶Ïi'Ÿž<ê³fÆH]NÞÆ¿Ú¨#sP¨dÄ=¨yÚ¤æ›-Ð|Bº¹ñÉ&ÓÍÃ™éæZúƒ™m¢F3Ùl6sM6g&3¡¤æ;|”Í3“˜qÚš¼IÛ#5æÚ2ŽyÈ	lÌ#Î¶`{L&8W™¦™Ù ”ñ<JÙ¦û"8“ðÜc‰½f=Ùˆº7x¢Ö|ÃL9Q£™r¢VØcÊùh§VËuiß6:4ÏÕ8Ñõ~bÜ§%š«Ÿè™hº¹…¶Œc¢‰mL4[£M4Ð¼[ÄFzÒ0v(2ß‚Ì“­ï
+_®È<yA2I&Éô7Ú$“d>ZÛº#óV‡ºvÖ¡yÑ8Z=AÑö_nÿìîŽ7™köÎÕìB[Ì1éÄ7&žâM>øŒt4±ÿ\ùJãpo8yÀÙw?Qß‚ò‰nP=ù„Ï©)‹Ü”wZå‚ŸïÅ/G(«ï‘Pß×tJBIh½ÕbÎ‹úÐáÐ<Ù-š+ PMªÙ“‡)°áÆ|š«&§¬ÞsÆ6ZbÒù¡qÔÙù.NÏ;ÉæÎÙ\N,´53Ñ„5f’)‡Úc*™`VT&¥ÎÃIœfúïRêZ}e¿	þlþÆ±y™Úß’Çœds×l.'ÚZŽÉ&d¨1Ù”CM6Ø™rœ¨|Áç\¬°ü$¸ªâÐü«üaÃr=ÝŸ›ì’Ò#9ÝìÂ«U‹¹QÛoŸËÕbîÔ¶ÇÛçŠµÜª]]°U…JFÒçyã¨ãóJÍk®™s2ç\ýBÏ”s9±Ð!Ìœ2Ô˜9§jæœ¨¼LoMV”©*Ö½Y£òº´KÓ¸Ö÷²™ÌÏÚF33öÏÐö—	ò¸(âÙ0‹ŸIi:6Rsëõ¡
+Ñ8ŠxOˆŠîAÑÅÌB[Ú1SOÈPcfr¨=V”	g¥d¦£H‡ÒÝ Ï‹Ñà¦ë¶bÍX²!g°”{/y¼‚c¦œ¡ÆL9åP{Œ¥)§X&æÖþuÂÈþ…§Òå å'¿ž7|r5·¹Sû„3Îµ<ã\±ùËg5Ô¦øe3'}ïÇ‰™h‚öãÄL5Aûq2Ù\=ß4‰ÉÊ4Ÿ¬oW8¥œÕI:+\»Íý '®=Ýd'×.ã¼ŸYhyfÊ‰kÌœ³%ÖL:ÐTÉìï6\™ƒæaæµÊfÝµãd± Þx¹œXhK8&—¡ÆÔR5±DÀr¤«^(å—o—ÃÁ'é@³[-y…–Zú¼„SKjI-XË8	ÕÏT™RzpòG?p`~6zÉ£Ì‰¹˜Y<Æì†L9Ö<ÅÜµ™r¬yˆ	æ­.æáw-½-¹°Ã¿þUv`~1™N»{¥I2{DæýÜ"šÝ Ùm²¹k6Û¢M8!àÔÉt"¶Þ¼l<š|hB3ýÞ.ÄÜ™ÅŒ5æÖlK¬¹7‹ åL'Iœ…‰Tµ}9\I'™_G:svÚ$™;'óaj¡­ã˜f‚Í¶`SM5ó2‰­d*”N4o>.%9…J±Ü'Mtþ¾…œ§[oÑ®ÃX§óô7Òy(:ÝÜB[Î1íD6&ž­Ñ¦žôÜº¤ÞUœ[LâÀ.`‘IËe¦,<#»"mÆE“ZØör{³¸øç¿]ôÌókíÙÿ2´JåöœgâU—NmCgÿigò2ií¼«Ù…¦¦½¸ñÆÔwC¼é/Bö:¶ÿVÞ
+„¾[ŒRÞºÏ.×|²[gøDíºª'j¸AñDmrM;+;'*_OœÖ‡†&K
+MïWq¢I4‰fÐœ©\Þ²ýÐ4Èl“pNÂéE¸	'á|¼¼uxÏ¨PéÔüÐQ(%7î‹` íØ.»žûtÍè	‰§ð%Oü\N,´ÅÓNÈPcº)‡šf"˜9ÓY\b¶Ù8ê¨tÍÍ©%µÜµ–nn¡­â˜`¢FÓÌÖh“M6Ç&«§‰Õ ¦Á}÷²æeÚž‹	Ù_“KÈPcZ	ÙÊšP>:ÌLâ‰x–Y;“L,É¤×k7™$“dò˜™,s%2Ù0¶ï¶ÕÍÙä6÷dŸP¸öõ&'Y¸ö€P²g5{VgÙZö¬Fç22‰™Xˆïü~\®Ä÷Á¤s¯Š	1½<5-çÁL/!C™^Ê¡fz‰àåX'3SŠç•£ŽÊû^åå˜¬óÞ,ï§ÚŽ©%f¬1¹l‰5½DðÒd#“Æó0Äüt?œwÝ³šåzN&d#eL1!C	&{Vc{™/êæq®W¹­^>||òBLÞ‹¥˜^/ã“bRÌ#SM9$J:Áã{ï¾É³ç^b6„Ä3Ö˜b²ù&8™“8/~e© ló°ó[œÆsÝY†y²[1O(¦¿b>L-´e\¸OhÉ|å1™ Á~%šé1™m±öØL‘Ì¾‰'¡šÏM9×âÆìI0¸ÿDÞš=3‰ï¥ØË&:y¨Gv>Ì-´å3Ý6f¾ÙlñdÂYñy«ìú+•’½htbž«q¢U¶[³Ídò<³7bº¹…¶Šc’‰mL3[£M4Ð\–6l8›tn~ÆïâÔt–jžnÁ&Ï5ÃÍåÄB[Æ1÷h!C¹C+GÚc-}ØŸ½LoMV”©*Ö!Z³òÓMó
+ØE«ˆÓ‘NcËQQ&ñú×¬ègm£›û§ê¹6AE<fñsè2Ëj§˜UÙƒÆÑ}×<h”õõneeÍe…|ˆ™ŽB†3eÍìDthIRž5:(oìïRÚº²’·kûc¥›[hk8&—¨ÑÆ³5ÚDÍDß)±÷ôUÓ Ñ$šD“h>ÚD“h>ZÛ:¬F;QÓq¡Fóõ¿Dµ1+~áøüºØYÎ÷Ññ„Û³=×óaj¡-ç˜x‚ÓÎ¶`“Îtn}zaÿþVIµ8½Óñh©öƒÏÛÅ‰©›¼0ÿÚÑ!è¨L£Z×GíÛ¦Áý?åõ¢ž+ú.ó‚h°!¯ñ(vvj•·?±ø ôb9,?þìôÖÐ‹Ý‚ù’`ú&äUL.!C‰%ä¥!RY~q!]ºjìàÁçBÙo(QŸ bZ‰mH.Qß{RL'¦šŒ¤Ìòªa¬òÒÌöqSˆVöÝJ;¯ÐVnP'#i¤húè¿*ðIyå£
+|iö"3¹NMºûA4³çfV“m9Ç„6Üz¶G›„úOèÔþxáPÀó½Î¼a“UßÉ¦÷ë8Ù$›dóØÙÆ‰šüT5ûª
+Â¸³óJÍug[´t³?n.'Ú"Ži&d¨!½”#M+ý·ò.›ÿÚÀT°òZ?ˆ•,|@+½^À1nB†óÙ&$–~<Úô‚Ë©J‡™ïëC’qu¶»M?&”G‚äbb¡­Ü 	%b¨1J1ÒÉ„²zsiÃ Â\l¶n”trÙ)–¼ìC,½^Á‰%±$–ÇŠe”Å3•G©ìì¹0î¬¼VÙl
+xRÙs+—mÇ´2ÔVÊ‘¦•þ[©Uš±@ûeãhÚ™VöœJÔšá˜Z¢FLÔí4Ó™™èH³>ä´übšTïÍÊ7[Xùú·m­|ýf“•¯Niå¡¬¼ŸYhk7æ­ÌXc^ëi‰µÇLò^O¥J¿/~BÁÊAãèa¸ÜXXýÿ   ÿÿìÝrÛFÒ†oåóp	ÀCIN¼Žâ’\©JNX	Ëˆ@B’JYW³§¹ŽÜØ¤@IƒîÁ€Ä»ÅI}µ'£õ¿Âö3oOÿ´³–¶ÖâÒK¶Z³´•<iiMå#+¢<n°úž?ÁSý»¾,,O–L×Oñ¤%S±Yâ’éª/ËËjgWÃåû<Õ¿µË¾[ž8/™.’âÉK¦b³ä¥ÝÚÅ›—iç·ØìžÐ¡m±¬´­#¯ƒ”,¥fÉIÛ:Â™’Ól^<ÌU^€§»Å–IZÛm9i9ùô+Úw±eùaqÞ<9ÉRj–œÄ•¶œ¤ÎÉh2Ò«ëùœUŒ¼Ì¤•g{"ràƒï”®ÊKåy)9îùM•Š`Kàµ¦dAÖ&H®òµœ‘î+fdùaÁq»/	Üc4žŒƒñÄŠ7Dc÷°e4„CJWÁºª1Å×‹I\m	&8'EµJj{ý^ÐNí S¬ƒUV;Ð‹J\m_¢öHYm_P;„Õ¡´z. ¶\Çp%¬²Úc–¼Ìâ‡IŠBsûÎGl‚ÏûEñ‹ÔÁÎ!ÄÎtÊN¯±ÊÇÂóhðÜ|Z`„yAH‘ža†/"Œ;"ÌŒ0îcãyÝùø½!Ï}ˆžžj„é¥'.÷DŠ½¯*·çªÉn¢²ÜˆÏ{ÁAñ¼Õ]¥==%j$jãVST{(¨€j{ƒž¨í÷<HmTî’[ùãâsõ}Gs_¡CÝÔôBˆšž¯2ÎG•ša¯1-Kšž9h¾9Ï‹oš¹ÔçÝwÍ ,YÂ—sW¼˜á8>ì‘È2 #Ë i½{[þìY4çf÷¼¥à>H”;TÃæc¸VÆæ é¾,äá¦æí~·/T•[5¥2î…ˆÜ#0I;D0ÃÇëâ¾_·Ë›³åäçeyê¼ÃgÓ{æÞè@tŠD=nãÈâì4h8ß|¾]/n×
+ðô;ƒ'þþãI²ZžC£ùHž4«Ãsà ðât-ê…§DîP"÷PYî@MîQoÐî®‚Fsï y+¹»|ÝÜþ…ZgTD¹3*2‹?jwW9(£¢ìñ	Áó{öWº^Ìxþ<­Øù9ºËRqnžFxŽºÌÖ7%ËNev^ê×¨3ñzÏÎR¶ÛŒ£ùD^…ÂÇPO”Ÿ2½i»O4Fte€¶Ê‘·¨DoâöuŸTù‰™@oãšÜ­õªUèü%)þÎÅŸºÐQ(ä |ºa—øzâgù¹ý‡ÄcçÓ÷GsÉ£‡?Á…ƒ—Ñ\¬`Aèé¢,ˆûDS·ý^ªáe —žMšËn,Ç/h®Ëñ£ž¨»±´'hƒæÒº8É­EÐ\´ýè­¥¥Em¿i®ü+ßZ(a4K³É|¡SÚ??à|~ Bê¯ëûâ7¸^ªçªô§´ *sžš|}Ý'bZBo*·ú¼tfsÅ"$¶{h‘EëØ5OPy
+•+ÞMBW“ÿßºe0²ñ£š_C¥Šw”ÓUÌ mYŠZRRüU?ˆþHÒYò€pôèÐC=ˆ¡î¨nya¨Xç»/D÷éñdÆPãžTÏ%q.ÞÁz/£‹'D—]úh¾Ëó].ò€Ý‡Êõ£Tveq•¯,ˆàø•ÜC¬QðØjäÊÒ1@¥)tÉ•EP\ñÊâ£MZƒm:Fý’)®ü·èûÅ·,_­Qm Ð’i<œ"˜Ý%ñLä-LÔ·‘SD¿u¡s¼'\gÙú>¹DDîfòÁÇ`Ëá
+:à
+O ^âk`_L[8Ô$ÓzjùiéLöŠhEâŽVÄ*i!«æT/®u7I^]‰ $±~(U5'yQµ;JïŠDEÓ»xÛ3dIñ"ºÃˆÊ2½›/WÙ=ºQì|\Qól¥¥ŒÈYxˆœ€ë©“3D2¶urŠ3êäÆ–œU­Ñ4šGÓ©øÛ†è	dö¤gõ‰ÁQ]Òðïâ©¯ |gÄŽEØ+ÑÌâMQ«äôŠäéE¨\pÉ•E’×•@rÅzŸVÆh«KK{ŒÊ—åÓ%³ŸÅ/.C´6§.’OzáAÊB(]Âá±B)=‡R¯ËnQ¿‡A—Š	%5Å»X“¥²D/^ØŒ_!Î`£Ï0”BCæðÀ^Ýå‰æyåzËò¼¸û7£72Ú¢êÞ%šå•ë-ËòJFû½Ô[¼¹Àz{ha]Û$:R$Ùâ÷†a”ãp¿YtŸ,'·X·<u>`]£Í»Èºö£cˆªûQ1_lýèöï¤²¥M´(šËõJæjv¢R½iQ¤íeóTC×ˆJ'íCÑ<„ô~Õ6´ø·Å&È¬é· BØb˜‚³?5ý²¹©jj*."å<	Íïˆ™b+†”1úHänëÄiÛˆ
+z½m‚|GÀ/(˜ØØÍ”(í9ÕB–br; M¹8ˆ¿øf¾í–EE€.[‰æÅdÎ|½œfiY&d¦¬è:Î‹¿7ÖüržVP½*~wë,ÕQXsÕí«t¾¨ÛÑæªÝ£‚õp7Zÿ¸`µú¶ºQžï¢rÁiÛQžï¢rÅIûQ"ï¢Êˆ½Êîóòq2O¦™S®È™F÷ÉMZ[Scö2)Î3ç[²ˆè&[®²Ÿ’EòdÎ2^­âùõþe½ñä6^ÅåQlèÛØù€üˆ‰×Up&ÒXež ºÃ'ûRË“²¸o.£å]4Ërñ^Öù²ªT½.FdÌë"|@í4³”Š×5Q¨¤é„–ûúæF Ó¬SRœ\‚[^„ÇhŸX )þªXãâßa™¬²É·ÉBÔŸÄù¥÷ÅôF˜§n¿Û”±?¶@¥kn%ÃÖOÑÙo´ýIÚÚ£¶?MOË‘¡³ìþúZ£VØ<ÏÒìFËtA†4êÖˆŠ5nRäðæ"Z–Y‘+•á¼ÝUù>~aâóå~cqü7ü¢ñyqEŸ¥ÀM%Tè)•[ÆOIMõK¹u½p£žhHÙ…Jõ–Ÿ!ê­x_ñÚ¾»¢¶t	å8
+iö£‚X«Ì[èPóo˜žã.]gÈ˜ÃÓÜ{ê›«lþû8‡j@7ŸbòVók*®õ)&n5?¤âbŸdÒ–eUo´ÎËGV¬²÷ñ¸1M”"äýÉYøNâƒN;_k¢I=ûhRkmÌ b:M#ïE:hf×i¢IFÑJvpsú«ÎÛ.“yœ-°B¢+ð´Bè×,OÚå¤#_aF qïi2q{6‹æKçB%oÛ]ýÐöûbˆPôšvoPA¨LnÒ Å™	óS¦6mz"ãwƒÞAéŽ9Û)«|ÚèŸ›(ÂBºõ ÃÆÅjÖƒ>›³‹Weƒi\Nu¸"H±©;Há©;XËió‰‚Ô@®½V1Ÿ(IMTá*Éí¢åZð#¬íÔ‡—©¿nºYÛ<Ag"[µ/ø†9ê{rtÐÑ¸†Óà(¼êBèÀÈ~ïN*ˆ4¹«?†z¢ü”‰ÝIý&±‘Ìyè‰âS¦v7ÕCzà‰OÀ49³<ïŠ¿k|Sæ&s _v?â|Â ªuÕ7R¥¥jê õ¬!%ü(Ú´vš2HÑh.¦BÒ–«¦¸÷§ÜËÒ¤8e¢¢3w½“kg™n&Øî4¬AwI®‰¤nÀ}â®ÑíÞPg“ÞnÓE¹§<=ÐtQî)4]“K|v Ç÷ÐÝ …ÚÀùÚ…«cçETNYª½™vÂÏÄOà¡­ÎÏ@™ŸÍøì«àóÓÏoß·Ægù_²TFÏêë#+Ù@âJnç/·4jòCÈí|oÄ¤BP¹Þ’¤®$²Ñ}œë†¨\nÉÂ_ë½§Ü-Í'êöOÍz.n×Åÿ!üüjYbÓë››(f¹Ùf¢ß<[:ïT
+rõƒâó½]™êã¡Å3ÉQpšIku=¸~ß[Š­‘~ÐBl(ON›±%æÓ•,IÛOìvÌÄêÌ=J¢æ]R 2+~ {ÿDÎM´ƒ‚øu9˜Þ/ft’µ=Ö`z“IÛóìïD¥·»N-í öÝSC7¨}õ4ÛúJß<[fo•ÇÒ—xHãyä|K–ÉTüa]+_nãûd1™Fyša/¢Êq. 9Zbw( V=±ÛožôgªÍìÚÌ®xo±™ÝšÜ6³{‚™Ýe¶N±þh¸›îj"‚&0=îhŽš+rÍÃióˆ¿úOÀÅDÐ”G°˜Hÿ„?ÒÀÄ“Œ”GáZS†%ÚAÔ§<×š2)qTÄJŽ¥DQ9pmÝŽ£A»AñCmSfŠe¾ä˜IÊh¾ù#¾Î¢ïÎ¯f‡=~cžfà)•Ûò³k~Jå>A„r´›³$Ä»yòõ£]–6›kyuApv›¡çZpVÿ Í+ëûä6óõzkˆÊïËBÓPŠÕÚ³óü,ªµÅ%\N³4›_cÄ¼ O+h¾‹™»	RHÿT:ÔLMÛðY1ó÷¤øŸÉ÷ÈùÍ¬ÛÜ|`üª‡ð—¶1alJÄ¦\:„Vƒn)C”›±)×!B¿çAb¿êTí*[ç“	Öñùµ8ý÷çg,Wû%Êõ¼nÂ†s €Î†³¹êÖÎã•m¾-k6ÍPS"¶u›]SS"¶µ›,¨9«½O>KÎ"¬ü=$Z’³}ˆ•ÀôÔƒÊg›w}ZV•›o‹_o'Q
+Vt×ÌJ‰Ø”›;‘f BlÈÎSa¥DlÊÍè4aC¹B¬,¤¹Íî\^B‡Ç!¦§2‰¯1-0-0-0-0-0-0[óèp¯x	u¿›˜‚ {Ìq·Ä[d¶xÌÄ†bè]G&m'˜åÙ¨)×›rn–e£¦\nÊÙY49{jøÜ6ŸL¥Í'µ]Èú·bÃíöE³oKhÛ^®—Ÿ’ÍÁ¤'OzÊÔ¦l=Y²S&6aëiÉ¹ËÔfó8Ï&ârÆ]®vsì¼5^£ÓÎ:¡|-Ób žÔdZÄšLk,3™yó=žýÏl´Þ;ä|·¶3Ï–Å­©æBº çâ¦¸eó@n©'mPÜWŒÍÝ×ÅÏpò|êlœ²çäùÜÙ 8aßiŸ<ŸÕÓF÷	f;ßg=]ß¿µµWmð´¦ó˜ùÚYš9ŸÖÑBåÉ³»¡ÕGfí§†Êõ¶´c‚Êå¶&”>oâõõuœ¢>Þ•ÙÆÓ©9ûÙå‹gÈ¨O¨%EPóe¶å§ÅÏ{¢Ø¤¼sL¢5eÛÉsç˜DlÊ–Óî{š´^åõ´ënbxºÛÕ™-t¼tÂž³Û!}ÂÖàÄ ãÀÜ|Yü€ÉÓhJÄ¦LL–.S¢5a`ê±˜çÝ%Ói–â:¡Ó
+—çYšÝ,t 3i“´'d1?.›œ5ÃL©Ü67Û15¥jÛÔ,nÞoGŽN°Ñ´èHRÝÓiAtº*3|¤Ë¤žm$ç(´äÜ=oÂSŠõ¶£à<éúÍª"d§G˜±)ûMü¢F§DlÂ†_!Þ‡Ä~Õèü±Y5ù!'¶9Jÿ1×ÕÚñAmÐ‰¬”ÓËNéš%²ôd[Z«cg›-¬Ýo‰e‚Ú²Ú§†Î<ú^P-™DØêêËÇŸpÎR"uCŽ¶° CÞ­=bö–'CÙ:P¶åéAÙ2ÔºÐC³å<ú+ÁÆ	ýž%wk'¾Ÿ89&nÙZO¦‰[žÆ“iâÖÚÎgß“y¶˜aOž—ð±‰‰NÏëœ¶%…88D@Ã9å¶Æx¶¦0žˆ`ÛSž_,~ Càëg=ß/Šß)rvš«UiM9r®–Ò,¡7_¿¯óh®ðâéu6	aóq1ã&Û\­DlÊÐä™©•ˆM˜6O»ærµNÑ4ít¨{þŒL³©þ¼4šMÈ<?»º²fSL¼M|€GI§ÄÈâ²ýøªR³…%.õ—Z‚Êý¤¶¨Ü•Ñ]´ŠÐ9ïnŽñ9ïÚv¤XIÌcç%Ëí(l‘Éu;
+Oj2]bÁùÌc®Ó¸ Y4¹Å|æã80xž­¢´ÔR>}Ÿ*UA-ü¦D|Z¿ÙÄÏêëbåƒª÷40¢›ißŸ,Õ–aù„ù)U›°ñôQ~Bj¿j~Î×«h1û[„_EÏOðq…Î‹è&M¢\œ2dÑiÑùüw´':«¯‹U0g‹N–j³E§Tm‹Nè¼În0lž×ìG‘é©Ì²C^1å‹#È¦kÙv¡hÙCcQö\ŒB9ek{QvÜ\dË4Y äüîÊ‚¢‡DÇ+'ì5U¦µ˜zà6‘ÓN=8fYPùi1Ã&ÛWN‰Ø”™Éó‘S"6e`Ú7Î§]bÉ¼œZóxºÛ‹’¤‘ˆÓSKÏž}üj³³ÝïE)¿,VÉB¶©Y~R³ÍËâRÛ¤l+ß/¾eùj½ˆV¢GXY@u•åË$±SÄ¨È™F÷I™W‚èeRÈ›gÎ·¤ü¯ßdÅŸõŸd‘—g¯Vñü:÷u¦qc;?gd?GwõU+Ö˜Zcúüw´'f·ß–u¦fH+SÛZÓ®a+SÛzSÞt¥³‚¾Xùxj zhÓsÀÙbªP£=µo¡T«‡è¢“ëP!¹Ü”ÙÉs¦\oÊô´#…ž6^Góâ¯…U]€§º3»0:»œd»Ù§hÑIxÌrÓ\n×BÓ`v×“1çY­Qsg6ëG;V–«ÎM±Ò®K9)V–Ÿ3V²MÏJÄ¦KžÙY‰Ø”ai“³O›®‹h—F“˜¿oŽwØ`£ÔTyÔ(CsØ˜›¸*Ð´¥Cf™Iµž…oé;©ù–¡RÛÒ!´ü–'7µŒjÅÊ_ Ã
+”_¢|nÎ^Ò,²µ3´ rói±ŠßlQÉOj¶¨Ä¥¶¨ä€Êh–¿—•øoPÁò>Ö¿¾¦Ê|÷¡20Gãj‡Jo—ÖZšÞ^M5Œ³MÇr›m:V&6ajÒHÇ*÷¦üvƒlÛ—²œ~OŠÿ×­ÚRæñêßÿý´iN)Â\¶3Ê<Il¨í'àÌÀ€!¯¼¶ð£H‘õ£$ø*ÀB5æ³,KµÙVª¶E,czåyñ×ÅúQÎác)Ccr¶xól$§}ó$ÚŽB5”³Íå²T›m:×³eÎy¼˜ý˜Üa~³<u¾`…B¦¹éÀÙÂrs™%çk%'OËÉRm¶–“
+9ÿ  ÿÿìÝÏNÛ@ð;Oá[Ï@Óž[…¶*iˆr6Î6qq¼(Ž#©ïÒwé‹u8‘ðŽÿ¤±ÙÒ°Ú³™eÉù7Rlrä;)ŽàŽM³hcš­“L¶×öL»® ¶oÜ2-Ó¸%¦”i‘dy¹Còv­—‰šn¤Ž¡K!žSùiiÒ(1Éóx{%fgS\â|Á
+“w8«ÀÜ­.ÞãìÆÍŠ„ó.ç±ù¬H8ïsB(:Wv?ýâˆåz~Ö‰i£Ý–jöÎ‡…U Á–šx©†­5åT³ØD`ÒîukU(÷ï¥¸¢­rwW™¼ËÙ#-KÆ]ûº‡Ãr	˜kX/KrM0ÀŒU"ÍC/De[œ¨|O*I%c1s{‹I%`÷Tfa(5ûŒ1Ö•Ä’X²®d]Ù,YWî»~²X'f…R×ÏÑ¼6Ë(é¬E–\ö‡ÌÇ•µÃ’	˜kX2KrM2Èœeú^üäÒË©ü1vÖËë$ý±òiiAmà°X"&VË²d“Ë
+.kÔÛªë…
+YšØîOµ ªÀnxÙJ<AÏþÞ(±k`üK õêé‚¯]?ÂSÛÞ³Š÷2,ªx©†%• `×Ÿ·Ù\zå²jy’Á¹KÉA$”ž•/Q³ôä$ƒ×O$\¦a…ä$h õíÜV¼KÁÈg´ƒÑìN*=-(i%'³£{	™mX3Q'³ûáfí“Ú‘N­&:°Ø$
+£»ÈJùSoÜÄ-åáù53©ý‡1›Œ§…y²9²ßß±œØ‘Ã6>uûZ§™CË)AUÀ>,-NêÆ×’ds:Ð±y-I6'aT¥ñÝ\Ï¤Æ¡g´í×«Ýdž—L^ãô™L¼'•aÁÄK5,—¯WËýNc³HÕåÈmË3'–~žßKb‰}z‹—jØ£[H,ý8·õËÕRßÝT^;b¼	vê²²Îx mAçUT²-ˆ/‚5ÅRøÜF<¶2Ùï¿çÌõÀc-Qßˆ`º²ýªÁT#uÐ~(†Zî uRYç¶•g¤Òc*Ñú:a™DK4,‘€ý³äqÇãZmo
+‘Ç+ÓÊ™«Ç:OK7Àñ-qôÇíº‚Ú³a\á2{Þ*fÚcý8n=¤M64ql=lÜ »Ð«¿‚T¯Vz19xÀÁDÝ›ñZàô£7Ò`ƒöæ9U=§ª½Qq„jÕ‰˜kÔÂtZkÏ}ãO”ZÆ¤¾W0çòF'zuV„ò„¶?\>--¨-•KÄ\£rY–kr	Á¥Ê&z9Qá\"Sú²I6É&Ù$›d³wlNõxaÿÑó1?¹šC|sÅÛ¾bB2{N&Þ­T0ñ2Ê%äõ’WŽåÉã×ß'ÿ   ÿÿ #¶.Ø

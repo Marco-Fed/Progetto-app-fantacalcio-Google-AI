@@ -246,7 +246,7 @@ object ListoneImporter {
         // Find header row in first 10 non-empty rows
         val (headerIndex, columnIndexes) = findHeaderAndColumns(rows)
 
-        val (roleIdx, nameIdx, teamIdx, quotationIdx, fvmIdx, starterIdx) = if (headerIndex != -1) {
+        val (roleIdx, nameIdx, teamIdx, quotationIdx, fvmIdx, starterIdx, fmIdx) = if (headerIndex != -1) {
             columnIndexes
         } else {
             inferColumnsFromData(rows)
@@ -283,7 +283,9 @@ object ListoneImporter {
             val rawStarter = if (starterIdx != -1) row.getOrNull(starterIdx) else null
             val starterProb = parseNumericValue(rawStarter)?.coerceIn(10, 99) ?: estimateStarterFromFvm(fvm, role)
 
-            val expPts = calculateExpectedPoints(fvm, role, starterProb)
+            val rawFm = if (fmIdx != -1) row.getOrNull(fmIdx) else null
+            val parsedFm = parseDecimalValue(rawFm)
+            val expPts = calculateExpectedPoints(fvm, role, starterProb, parsedFm)
             val risk = if (starterProb < 65) RiskLevel.ALTO else if (starterProb < 82) RiskLevel.MEDIO else RiskLevel.BASSO
 
             val safeId = "list_${name.lowercase(Locale.ROOT).replace(Regex("[^a-z0-9]"), "_")}_${UUID.randomUUID().toString().take(4)}"
@@ -456,7 +458,8 @@ object ListoneImporter {
         val teamIdx: Int = -1,
         val quotationIdx: Int = -1,
         val fvmIdx: Int = -1,
-        val starterIdx: Int = -1
+        val starterIdx: Int = -1,
+        val fmIdx: Int = -1
     )
 
     private fun findHeaderAndColumns(rows: List<List<String>>): Pair<Int, ColumnIndices> {
@@ -471,6 +474,7 @@ object ListoneImporter {
             var quotationIdx = -1
             var fvmIdx = -1
             var starterIdx = -1
+            var fmIdx = -1
 
             for (colIdx in normRow.indices) {
                 val h = normRow[colIdx]
@@ -481,11 +485,12 @@ object ListoneImporter {
                     quotationIdx == -1 && (h == "qta" || h == "qt" || h == "quotazione" || h == "qa" || h == "quota" || h == "costo") -> quotationIdx = colIdx
                     fvmIdx == -1 && (h == "fvm" || h == "fvma" || h == "valore" || h == "fanta valore" || h == "fvm1000") -> fvmIdx = colIdx
                     starterIdx == -1 && (h.contains("tit") || h.contains("perc") || h.contains("starter")) -> starterIdx = colIdx
+                    fmIdx == -1 && (h == "fm" || h == "fantamedia" || h == "fanta media" || h == "mediavoto" || h == "mv" || h == "media") -> fmIdx = colIdx
                 }
             }
 
             if (nameIdx != -1 || roleIdx != -1) {
-                return Pair(i, ColumnIndices(roleIdx, nameIdx, teamIdx, quotationIdx, fvmIdx, starterIdx))
+                return Pair(i, ColumnIndices(roleIdx, nameIdx, teamIdx, quotationIdx, fvmIdx, starterIdx, fmIdx))
             }
         }
 
@@ -581,6 +586,17 @@ object ListoneImporter {
         return d.toInt()
     }
 
+    private fun parseDecimalValue(valueStr: String?): Double? {
+        if (valueStr.isNullOrBlank()) return null
+        val clean = valueStr.trim()
+            .replace("\"", "")
+            .replace("%", "")
+            .replace("€", "")
+            .replace(",", ".")
+            .trim()
+        return clean.toDoubleOrNull()
+    }
+
     private fun estimateStarterFromFvm(fvm: Int, role: Role): Int {
         val base = when (role) {
             Role.P -> if (fvm >= 25) 95 else if (fvm >= 10) 70 else 25
@@ -591,14 +607,19 @@ object ListoneImporter {
         return base.coerceIn(10, 99)
     }
 
-    private fun calculateExpectedPoints(fvm: Int, role: Role, starterProb: Int): Double {
-        val base = when (role) {
-            Role.P -> 130.0 + (fvm * 2.2)
-            Role.D -> 110.0 + (fvm * 3.1)
-            Role.C -> 120.0 + (fvm * 3.6)
-            Role.A -> 140.0 + (fvm * 4.2)
+    private fun calculateExpectedPoints(fvm: Int, role: Role, starterProb: Int, explicitFm: Double? = null): Double {
+        if (explicitFm != null && explicitFm in 4.0..10.0) {
+            return Math.round(explicitFm * 10.0) / 10.0
         }
-        val factor = (starterProb / 100.0).coerceIn(0.2, 1.0)
-        return Math.round(base * factor * 10.0) / 10.0
+        val (baseAvg, amplitude) = when (role) {
+            Role.P -> Pair(5.5, 0.9)
+            Role.D -> Pair(5.7, 1.3)
+            Role.C -> Pair(5.9, 1.8)
+            Role.A -> Pair(6.0, 2.7)
+        }
+        val fvmNormalized = (fvm.toDouble() / 350.0).coerceIn(0.0, 1.0)
+        val starterFactor = (0.75 + 0.25 * (starterProb / 100.0)).coerceIn(0.75, 1.0)
+        val calc = (baseAvg + fvmNormalized * amplitude) * starterFactor
+        return Math.round(calc.coerceIn(4.5, 9.2) * 10.0) / 10.0
     }
 }

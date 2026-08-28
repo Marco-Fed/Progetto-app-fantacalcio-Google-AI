@@ -32,10 +32,18 @@ data class LeagueConfig(
     val goalThreshold: Int = 66,
     val goalBandStep: Int = 4,
     
-    // Weight parameters for 3 seasons (2025-26 > 2024-25 > 2023-24)
-    val weight2025_26: Double = 0.50,
-    val weight2024_25: Double = 0.35,
-    val weight2023_24: Double = 0.15
+    // Additional league parameters
+    val underCriterionMode: String = "NESSUNO", // "NESSUNO", "BONUS", "VINCOLO"
+    val substitutionsCount: Int = 5,
+    val substitutionType: String = "PARI_RUOLO", // "PARI_RUOLO", "CAMBIO_MODULO"
+    val officeReserve: Boolean = true, // Riserva d'ufficio
+    val preferredFormation: String = "3-4-3",
+    val benchSize: Int = 12,
+    val alternativeComparabilityThreshold: Double = 25.0, // Max delta percentage for comparables
+    
+    // Weight parameters for historical seasons: strictly 2025-26 (0.65) > 2024-25 (0.35). 2023-24 is strictly forbidden.
+    val weight2025_26: Double = 0.65,
+    val weight2024_25: Double = 0.35
 ) {
     val totalSlots: Int get() = slotsP + slotsD + slotsC + slotsA
     

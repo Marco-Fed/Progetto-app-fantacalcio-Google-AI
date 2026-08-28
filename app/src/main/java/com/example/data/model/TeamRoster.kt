@@ -39,10 +39,28 @@ data class TeamEntity(
     }
     
     /**
-     * Minimum credits strictly needed to purchase 1 credit per remaining empty slot.
+     * Minimum credits strictly needed to purchase 1 credit per remaining empty slot (Simple Minimum Budget).
      */
     fun minimumCompletionBudget(config: LeagueConfig): Int {
         return totalRemainingSlots(config).coerceAtLeast(1)
+    }
+
+    fun simpleMinimumBudget(config: LeagueConfig): Int = minimumCompletionBudget(config)
+
+    /**
+     * Realistic minimum budget estimated to fill all remaining empty slots with viable starter/rotation profiles.
+     */
+    fun realisticMinimumBudget(config: LeagueConfig): Int {
+        val remP = remainingSlotsForRole(Role.P, config)
+        val remD = remainingSlotsForRole(Role.D, config)
+        val remC = remainingSlotsForRole(Role.C, config)
+        val remA = remainingSlotsForRole(Role.A, config)
+        
+        val costP = remP * 2
+        val costD = remD * 1
+        val costC = remC * 2
+        val costA = remA * 3
+        return (costP + costD + costC + costA).coerceAtLeast(totalRemainingSlots(config))
     }
     
     /**

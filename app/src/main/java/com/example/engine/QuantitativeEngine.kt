@@ -140,36 +140,16 @@ object QuantitativeEngine {
      * Evaluates theoretical player score (0 to 100).
      */
     fun calculateTheoreticalValue(player: PlayerEntity, config: LeagueConfig): Double {
-        val basePoints = player.expectedFantasyPoints // e.g. 8.65 for Lautaro
-        val starterFactor = (player.starterProb2026_27.toDouble() / 100.0).coerceIn(0.2, 1.0)
-        val historicalMod = calculateHistoricalModifier(player)
-        
-        var bonus = 0.0 + historicalMod
-        if (player.isPenaltyTaker) {
-            bonus += if (player.penaltyOrder == 1) 0.6 else 0.3
-        }
-        if (player.isFreeKickTaker) bonus += 0.2
-        if (player.isCornerTaker) bonus += 0.15
+        return PlayerStatModel.calculatePlayerScore(player, config)
+    }
 
-        // Defense modifier impact on defenders & goalkeepers
-        if (config.defenseModifierEnabled) {
-            if (player.role == Role.D && player.expectedFantasyPoints >= 6.3) {
-                bonus += 0.4
-            } else if (player.role == Role.P && player.team in listOf("Inter", "Juventus", "Napoli", "Milan", "Atalanta")) {
-                bonus += 0.35
-            }
-        }
-
-        // Scale into 0..100 domain based on role expectations
-        val rawScore = when (player.role) {
-            Role.P -> (basePoints - 4.5 + bonus) * 35.0
-            Role.D -> (basePoints - 5.5 + bonus) * 38.0
-            Role.C -> (basePoints - 5.8 + bonus) * 32.0
-            Role.A -> (basePoints - 6.0 + bonus) * 28.0
-        }
-
-        val weightedScore = (rawScore * (0.6 + 0.4 * starterFactor)).coerceIn(10.0, 99.0)
-        return Math.round(weightedScore * 10.0) / 10.0
+    /**
+     * Computes the intrinsic Fair Value in credits for the given league economy.
+     */
+    fun calculateFairValue(player: PlayerEntity, config: LeagueConfig): Int {
+        val effectiveFvm = if (player.fvm > 0) player.fvm else (player.quotation * 20).coerceAtLeast(1)
+        val budgetShare = (effectiveFvm.toDouble() / 1000.0).coerceIn(0.001, 0.70)
+        return (budgetShare * config.initialCredits).roundToInt().coerceAtLeast(1)
     }
 
     /**
@@ -208,6 +188,7 @@ object QuantitativeEngine {
         val roleInflation = calculateRoleInflation(role, events)
         
         val theoreticalVal = calculateTheoreticalValue(player, config)
+        val fairValueCredits = calculateFairValue(player, config)
         val replacementVal = calculateReplacementValue(player, availableInRole, config)
         val marginalVal = (theoreticalVal - replacementVal).coerceAtLeast(0.0)
 
@@ -215,6 +196,8 @@ object QuantitativeEngine {
         val userRemainingSlots = userTeam.totalRemainingSlots(config)
         val userRoleSlotsRemaining = userTeam.remainingSlotsForRole(role, config)
         val maxAffordableBid = userTeam.maxAffordableBid(config)
+        val simpleMinBudget = userTeam.simpleMinimumBudget(config)
+        val realisticMinBudget = userTeam.realisticMinimumBudget(config)
         val minRequiredBudget = (userRemainingSlots - 1).coerceAtLeast(0) * 1
 
         // Base price estimation from FVM & theoretical value scaled to league initial credits
@@ -262,6 +245,14 @@ object QuantitativeEngine {
             config = config
         )
 
+        val hasSufficientAlternatives = alternatives.size >= 3
+        val altNotice = if (!hasSufficientAlternatives) {
+            "Non ci sono tre alternative realmente comparabili disponibili."
+        } else null
+
+        // Dynamic Confidence calculation
+        val dynamicConfidence = PlayerStatModel.computeDataConfidence(player)
+
         // Decision logic & Reasons
         val (decision, reasons) = DecisionEngine.generateDecision(
             player = player,
@@ -283,6 +274,7 @@ object QuantitativeEngine {
         return QuantitativeEvaluation(
             player = player,
             theoreticalValue = theoreticalVal,
+            fairValueCredits = fairValueCredits,
             userMarginalValue = Math.round(marginalVal * 10.0) / 10.0,
             replacementValue = Math.round(replacementVal * 10.0) / 10.0,
             scarcityIndex = scarcity,
@@ -293,14 +285,17 @@ object QuantitativeEngine {
             maximumBid = finalMaxBid,
             expectedAuctionPriceMin = expPriceMin,
             expectedAuctionPriceMax = expPriceMax,
+            simpleMinimumBudget = simpleMinBudget,
+            realisticMinimumBudget = realisticMinBudget,
             minimumRequiredBudgetAfterPurchase = minRequiredBudget,
             winProbabilityMonteCarlo = mcWinProb,
             decision = decision,
             reasons = reasons,
             alternatives = alternatives,
+            alternativeNotice = altNotice,
             risk = player.riskLevel,
-            confidence = player.confidenceLevel,
-            hasSufficientAlternatives = alternatives.size >= 3
+            confidence = dynamicConfidence,
+            hasSufficientAlternatives = hasSufficientAlternatives
         )
     }
 
